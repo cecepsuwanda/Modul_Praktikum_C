@@ -1,0 +1,38 @@
+---
+description: Struktur modul praktikum OBE/SN-Dikti + format LaTeX seperti modul_praktikum_python
+globs:
+  - "**/*.tex"
+  - "**/contoh_code/**"
+alwaysApply: false
+---
+
+# Struktur repositori modul praktikum (OBE)
+
+Saat menambah/mengatur isi modul praktikum di repositori ini, **isi substantif** harus mengikuti kerangka `struktur_modul_praktikum_OBE.text` (SN-Dikti + OBE). **Tata dokumen LaTeX dan pola bab** harus mengikuti referensi `modul_praktikum_python/` (bukan menyalin narasi Python ke Praktikum C tanpa adaptasi).
+
+## Pemetaan kerangka OBE → file
+
+| Bagian `struktur_modul_praktikum_OBE.text` | Di mana diwujudkan |
+|-------------------------------------------|---------------------|
+| Bagian depan (identitas MK, tim, deskripsi, prasyarat, pemetaan CPL/CPMK/Sub-CPMK, matriks, kaitan RPS, tujuan, petunjuk mahasiswa) | `modul/modul-00.tex` (setara Bab 0) |
+| Struktur per pertemuan (judul+waktu, Sub-CPMK terukur, teori ringkas, K3, sarpras, prosedur, pengalaman belajar/LKS, asesmen formatif, referensi) | `modul/modul-01.tex`, `modul-02.tex`, … per sesi |
+| Asesmen semester, rubrik, panduan laporan, jadwal | `lampiran.tex` (bagian penilaian/rubrik/referensi modul) + konsistensi dengan `silabus_praktikum_*.tex` |
+| Penutup (rangkuman Sub-CPMK, refleksi, umpan balik, integrasi sumatif) | bab penutup atau subbagian di `lampiran.tex` / bab akhir — jangan hilangkan jejak capaian |
+| Lampiran (template LKS, rubrik lengkap, daftar pustaka, glosarium) | `lampiran.tex` + aset pendukung yang dirujuk dari modul |
+
+**Checklist SN-Dikti** di akhir `struktur_modul_praktikum_OBE.text`: verifikasi sebelum modul “final” — setiap bab harus menunjukkan rantai **Sub-CPMK → CPMK → CPL** dan bukti asesmen yang mengukur capaian tersebut.
+
+## Format LaTeX (wajib samakan pola dengan `modul_praktikum_python/`)
+
+- **Kelas dokumen & kerangka:** `main.tex` memakai `\documentclass[12pt,a4paper]{book}`, `\input{preamble}`, `\frontmatter` / `\mainmatter` / `\backmatter`, `\subfile{modul/modul-NN}` per bab, `\input{lampiran}`.
+- **Preamble:** salin **pol**a `preamble.tex` — paket inti (`inputenc` utf8, `fontenc` T1, `babel` indonesian, `geometry` margin, `booktabs`, `longtable`, `array`, `enumitem`, `amssymb`, `hyperref` + `xurl` + `breaklinks`, `subfiles`, header `fancyhdr`, dsb.). Untuk bahasa selain Python, sesuaikan `listings` / warna / bahasa listing, buang makro yang tidak relevan.
+- **Lingkungan semantik OBE (pertahankan nama dan urutan pemakaian di bab):** `subcpmk`, `aktivitas`, `latihan`, `asesmen`, `checklist`, `rangkuman`; kotak `konsep`, `catatan`, `contoh` bila perlu.
+- **Makro sesi:** `\SesiRPS{minggu}{sub-CPMK}{waktu}{CPMK}` di awal bab praktikum (setelah `subcpmk`), isi disesuaikan MK/RPS Anda.
+- **Struktur isi tiap bab praktikum (pola):** `subcpmk` → `\SesiRPS{...}` → `\section{Sarana dan prasarana}` → `\section{Prosedur kerja}` → materi → `\section{Referensi sesi}` → `aktivitas` → `latihan` → `asesmen` / `checklist` / `rangkuman` sesuai contoh bab Python.
+- **Kode contoh:** letakkan di `contoh_code/` (organisasi paralel dengan contoh Python: bahasa target per folder), cuplikan di bab memakai `lstlisting` atau lingkungan kode yang didefinisikan di preamble; nama berkas konsisten dengan judul subbab.
+
+## Larangan / konsistensi
+
+- Jangan mengganti kerangka `book` + `subfiles` + `modul-00` … + `lampiran` dengan struktur lain tanpa diminta eksplisit.
+- Isi **Praktikum C** (atau MK lain) harus spesifik bahasa/alat tersebut; `modul_praktikum_python/` hanya acuan **format dan kerangka**, bukan teks yang disalin mentah.
+- RPS/silabus terpisah: ikuti aturan proyek untuk `silabus_praktikum_c.tex` (`silabus-praktikum-c-rps.mdc`) agar minggu, Sub-CPMK, dan asesmen selaras dengan modul.

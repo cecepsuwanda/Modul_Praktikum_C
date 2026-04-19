@@ -1,0 +1,42 @@
+---
+description: RPS/silabus Praktikum C — struktur OBE + format LaTeX seperti silabus Python
+globs: silabus_praktikum_c.tex
+alwaysApply: false
+---
+
+# Silabus / RPS Praktikum C (`silabus_praktikum_c.tex`)
+
+Saat membuat, mengisi, atau merevisi file ini, ikuti **dua** acuan berikut.
+
+## 1. Struktur isi (wajib) — `struktur_silabus_OBE.text`
+
+Isi dokumen harus mencerminkan kerangka RPS praktikum OBE/SN-Dikti pada file tersebut, dengan pemetaan ke bagian LaTeX berikut (sama urutan dan cakupan dengan contoh Python):
+
+| Kerangka OBE | Bagian di `.tex` |
+|----------------|------------------|
+| Bagian A — identitas & konteks MK praktikum | `\section*{Bagian A. ...}` + `tabular` identitas, narasi deskripsi/waktu/sarana |
+| Bagian B — sembilan komponen minimal RPS | `\section*{Bagian B. ...}` + `enumerate` berlabel **1.–9.** yang merujuk Bagian C–E |
+| Bagian C — CPL, CPMK, Sub-CPMK, matriks, strategi | `\section*{Bagian C. ...}` + `\subsection*{C.1}` … **C.5** (CPL, CPMK, Sub-CPMK, matriks CPMK→CPL, strategi analisis) |
+| Bagian D — ringkasan asesmen semester | `\section*{Bagian D. ...}` + `longtable` komponen, teknik, pemetaan CPMK/Sub-CPMK, bobot **100%** |
+| Bagian E — rencana mingguan | `\section*{Bagian E. ...}` + `landscape` + `longtable` **8 kolom** sesuai blueprint: Minggu, Sub-CPMK, Bahan kajian, Metode, Pengalaman belajar, Waktu, Asesmen, Referensi singkat |
+| Bagian F — checklist SN-Dikti | `\section*{Bagian F. ...}` + `itemize` poin verifikasi |
+| Daftar referensi | `\section*{Daftar Referensi}` + sumber yang relevan untuk MK **C** (bukan menyalin referensi Python jika tidak sesuai) |
+
+Sembilan komponen RPS (identitas, CPL, kemampuan tahap/Sub-CPMK, bahan kajian, metode, waktu, pengalaman belajar, penilaian, referensi) harus **terlihat** di narasi Bagian B dan **teroperasionalkan** di Bagian C–E (setiap baris minggu konsisten: Sub-CPMK ↔ bahan kajian ↔ pengalaman belajar ↔ asesmen).
+
+## 2. Format LaTeX (wajib) — `silabus_praktikum_python.tex`
+
+- Samakan **preamble** dan paket inti: `article` 12pt a4paper, `inputenc` utf8, `fontenc` T1, `babel` indonesian, `geometry` margin 2.5cm, `longtable`, `array`, `booktabs`, `enumitem`, `amssymb`, `pdflscape`, `hyperref` + `xurl`, `breaklinks`.
+- **Judul:** `\begin{center}` … **RENCANA PEMBELAJARAN SEMESTER (RPS)**, nama MK **Praktikum Pemrograman C** (bukan Python), OBE, prodi/fakultas/PT (placeholder boleh `\ldots` seperti contoh).
+- **Penanda bagian:** komentar pembatas `====` + `\section*{Bagian X. ...}` (bukan `\chapter`).
+- **Bagian A:** `tabular` dua kolom `{@{}p{5.2cm}p{9.5cm}@{}}` dengan baris identitas setara contoh; sesuaikan nama MK, kode MK, dan konten **khusus bahasa C** (compiler, standar C, gdb, Makefile, pointer, struktur, berkas biner/teks, dsb.).
+- **Bagian C:** matriks CPMK→CPL memakai `tabular` dengan `\checkmark` seperti contoh; Sub-CPMK dalam `description` atau struktur setara.
+- **Bagian D:** `longtable` dengan header `\endfirsthead` / `\endhead` / `\endfoot` sama pola contoh.
+- **Bagian E:** `{\small \begin{landscape} ... \end{landscape}}`, `\setlength{\tabcolsep}{3pt}`, `\renewcommand{\arraystretch}{1.15}`, **8 kolom** dengan header persis: **Mgg | Sub-CPMK | Bahan kajian | Metode | Pengalaman belajar | Waktu | Asesmen | Referensi singkat**.
+- **Penutup:** `\section*{Daftar Referensi}` + `\begin{flushright}` blok tanda tangan seperti contoh; `\end{document}`.
+
+## Larangan / konsistensi
+
+- Jangan mengganti kerangka A–F dengan kerangka lain (mis. hanya silabus satu halaman) tanpa diminta eksplisit.
+- Isi substantif (CPL/CPMK/Sub-CPMK, minggu, referensi) harus **spesifik Praktikum C**, bukan menyalin narasi Python tanpa adaptasi.
+- Rujuk `struktur_silabus_OBE.text` untuk definisi kolom dan komponen; rujuk `silabus_praktikum_python.tex` hanya untuk **tata letak LaTeX dan pola tabel**.
