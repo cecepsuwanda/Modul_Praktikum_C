@@ -1,0 +1,199 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{0}}{}
+\begin{document}
+
+\chapter{Pendahuluan, Identitas Modul, dan Pemetaan OBE}
+
+\section{Identitas Mata Kuliah Praktikum}
+
+\begin{description}[style=nextline, widest=Dosen pengampu / koordinator praktikum:, itemsep=0.35em]
+  \item[Nama mata kuliah:] Praktikum Pemrograman C
+  \item[Kode:] TIF-1xx (sesuaikan kurikulum prodi)
+  \item[Bobot:] 1 SKS (seluruhnya praktikum)
+  \item[Program studi:] Teknik Informatika (S1)
+  \item[Semester / tahun akademik:] \ldots
+  \item[Dosen pengampu / koordinator praktikum:] \ldots
+  \item[Prasyarat:] Algoritma dan Pemrograman / Pemrograman Dasar (sesuai kurikulum)
+\end{description}
+
+\section{Deskripsi dan Ruang Lingkup}
+
+Modul praktikum ini mendukung pencapaian \textbf{CPMK} dan \textbf{Sub-CPMK} mata kuliah \textbf{Praktikum Pemrograman C} berbasis \textbf{OBE}, selaras \texttt{silabus\_praktikum\_c.tex}. Cakupan materi meliputi: toolchain \texttt{gcc}/\texttt{clang}, model kompilasi--penautan, sintaks C (C11/C17), variabel dan tipe data, operator, \texttt{stdio}, struktur kontrol (percabangan dan perulangan), fungsi dan rekursi, organisasi multi-berkas (\texttt{.c}/\texttt{.h}), larik dan string, pointer dan aritmetika pointer, \texttt{struct}/\texttt{union}/\texttt{enum}/\texttt{typedef}, manajemen memori dinamis (\texttt{malloc}/\texttt{free}), berkas teks dan biner, preprocessor dan makro, \texttt{Makefile}, \texttt{gdb} pengenalan, serta pengenalan struktur data dasar (linked list, stack, queue).
+
+Daftar lengkap 30 modul materi (dari dasar sampai lanjutan) tersedia di berkas \path{sumber_materi.md}.
+
+Modul praktikum ini mencakup Modul 1--15 untuk satu semester; Modul 16--30 (sorting/searching lanjut, bitwise, function pointer, multithreading, network programming, fitur C23, secure coding) dapat digunakan sebagai pengayaan atau semester lanjut.
+
+\section{Capaian Pembelajaran Lulusan (CPL) yang Dibebankan}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{CPL-1 (Pengetahuan):} Konsep algoritme dan pemrograman prosedural dalam C, representasi data (tipe dasar, array, string, struct, union, enum), modularitas berkas sumber, manajemen memori (stack, heap, pointer, alokasi dinamis), serta prinsip penanganan berkas dan pustaka standar.
+  \item \textbf{CPL-2 (Keterampilan umum):} Pemecahan masalah terstruktur dan implementasi program C.
+  \item \textbf{CPL-3 (Keterampilan khusus):} Menulis, mengompilasi, menautkan, dan memperbaiki program C dengan \texttt{make} dan \texttt{gdb} tingkat dasar.
+  \item \textbf{CPL-4 (Sikap):} K3 laboratorium, etika akademik, kolaborasi terbatas.
+  \item \textbf{CPL-5 (Profesionalisme praktis):} \texttt{README} singkat, peringatan kompilator, organisasi proyek kecil, coding standards.
+\end{itemize}
+
+\section{Capaian Pembelajaran Mata Kuliah (CPMK)}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{CPMK-1 (Fondasi):} Toolchain, sintaks dasar, variabel, tipe data, operator, \texttt{stdio} I/O terformat.
+  \item \textbf{CPMK-2 (Kontrol Alur):} Percabangan (\texttt{if}, \texttt{switch}) dan perulangan (\texttt{for}, \texttt{while}, \texttt{do-while}).
+  \item \textbf{CPMK-3 (Modularitas):} Fungsi, prototipe, scope, storage classes, rekursi, multi-berkas (\texttt{.c}/\texttt{.h}).
+  \item \textbf{CPMK-4 (Data Agregat):} Larik 1D/2D, string, pencarian dan pengurutan dasar.
+  \item \textbf{CPMK-5 (Pointer \& Struct):} Pointer, aritmetika pointer, pass-by-reference, \texttt{struct}/\texttt{union}/\texttt{enum}/\texttt{typedef}.
+  \item \textbf{CPMK-6 (Memori Dinamis):} \texttt{malloc}, \texttt{calloc}, \texttt{realloc}, \texttt{free}; stack vs heap; common pitfalls.
+  \item \textbf{CPMK-7 (File \& Preprocessor):} Berkas teks/biner, preprocessor, makro, include guards, \texttt{Makefile}, \texttt{gdb}.
+  \item \textbf{CPMK-8 (Struktur Data \& Integrasi):} Linked list, stack, queue; proyek integratif multi-berkas.
+\end{itemize}
+
+\section{Pemetaan Sub-CPMK ke CPMK}
+
+{\small
+\begin{longtable}{|>{\raggedright\arraybackslash}p{8.0cm}|c|}
+\hline
+\textbf{Sub-CPMK (indikator)} & \textbf{CPMK} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Sub-CPMK (indikator)} & \textbf{CPMK} \\
+\hline
+\endhead
+\hline
+\endfoot
+1.1 K3, kompilator, program pertama; 1.2 Variabel, tipe data; 1.3 I/O format; 1.4 Operator & 1 \\
+\hline
+2.1 Percabangan (\texttt{if}, \texttt{switch}); 2.2 Perulangan, \texttt{break}/\texttt{continue} & 2 \\
+\hline
+3.1 Fungsi, prototipe, scope, storage classes; 3.2 Rekursi; 3.3 Multi-berkas & 3 \\
+\hline
+4.1 Array 1D/2D; 4.2 String, \texttt{string.h}; 4.3 Pencarian dan sorting & 4 \\
+\hline
+5.1 Pointer, alamat, dereferensi, aritmetika; 5.2 Pass-by-reference, \texttt{void*}, \texttt{const}; 5.3 \texttt{struct}, nested, \texttt{typedef}; 5.4 \texttt{union}, \texttt{enum} & 5 \\
+\hline
+6.1 Stack vs heap, \texttt{malloc}/\texttt{calloc}; 6.2 \texttt{realloc}/\texttt{free}; 6.3 Common pitfalls; 6.4 Array/struct dinamis & 6 \\
+\hline
+7.1 File I/O (\texttt{fopen}/\texttt{fclose}, mode); 7.2 Baca/tulis teks \& biner; 7.3 \texttt{fseek}/\texttt{ftell}; 7.4 Preprocessor, makro, kompilasi kondisional & 7 \\
+\hline
+8.1 Linked list; 8.2 Stack; 8.3 Queue; 8.4 Proyek integratif & 8 \\
+\hline
+\end{longtable}
+}
+
+\section{Matriks CPMK ke CPL}
+
+{\small
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{CPMK} & \textbf{CPL-1} & \textbf{CPL-2} & \textbf{CPL-3} & \textbf{CPL-4} & \textbf{CPL-5} \\
+\hline
+CPMK-1 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+CPMK-2 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & \\
+CPMK-3 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ \\
+CPMK-4 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & \\
+CPMK-5 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & \\
+CPMK-6 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ \\
+CPMK-7 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+CPMK-8 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\hline
+\end{tabular}
+}
+
+\section{Keterkaitan dengan Rencana Pembelajaran Semester (RPS)}
+
+Acuan waktu: \textbf{$\sim$170 menit} per minggu per SKS praktikum (KPT; sesuaikan slot prodi).
+
+{\footnotesize
+\begingroup\setlength{\tabcolsep}{4pt}%
+\begin{longtable}{|c|>{\raggedright\arraybackslash}p{2.2cm}|c|p{6.2cm}|c|}
+\hline
+\textbf{Mgg} & \textbf{Sub-CPMK utama} & \textbf{Bab} & \textbf{Judul / Topik} & \textbf{Waktu} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Mgg} & \textbf{Sub-CPMK utama} & \textbf{Bab} & \textbf{Judul / Topik} & \textbf{Waktu} \\
+\hline
+\endhead
+\hline
+\endfoot
+1 & 1.1, K3, etika & 0 & Pendahuluan, K3, kontrak & $\sim$170' \\
+\hline
+2 & 1.1--1.2 & 1 & Toolchain, program pertama, sejarah C & $\sim$170' \\
+\hline
+3 & 1.2--1.4 & 2 & Tipe data, operator, I/O format & $\sim$170' \\
+\hline
+4 & 2.1 & 3 & Percabangan (\texttt{if}, \texttt{switch}) & $\sim$170' \\
+\hline
+5 & 2.2 & 4 & Perulangan (\texttt{for}, \texttt{while}, \texttt{do-while}) & $\sim$170' \\
+\hline
+6 & 3.1--3.2 & 5 & Fungsi, prototipe, scope, rekursi & $\sim$170' \\
+\hline
+7 & 4.1, 4.3 & 7 & Larik 1D/2D, pencarian, sorting & $\sim$170' \\
+\hline
+8 & UTS & --- & Ujian tengah (CPMK-1--4) & $\sim$170' \\
+\hline
+9 & 4.2 & 8 & String dan \texttt{string.h} & $\sim$170' \\
+\hline
+10 & 5.1--5.2 & 9 & Pointer, pass-by-reference & $\sim$170' \\
+\hline
+11 & 5.3--5.4 & 10 & \texttt{struct}, \texttt{union}, \texttt{enum}, \texttt{typedef} & $\sim$170' \\
+\hline
+12 & 6.1--6.4 & --- & Manajemen memori dinamis (bab baru) & $\sim$170' \\
+\hline
+13 & 7.1--7.4 & 11--12 & File I/O, preprocessor, \texttt{Makefile}, \texttt{gdb} & $\sim$170' \\
+\hline
+14 & 8.1--8.3 & --- & Struktur data (linked list, stack, queue) & $\sim$170' \\
+\hline
+15 & 8.4, lintas & --- & Mini-proyek integratif & $\sim$170' \\
+\hline
+16 & UAS & --- & Ujian akhir (CPMK-5--8) & $\sim$170' \\
+\hline
+\end{longtable}%
+\endgroup
+}
+
+\begin{catatan}
+Minggu 12, 14, dan 15 merujuk pada materi di \texttt{sumber\_materi.md} (Modul 12: Memori Dinamis, Modul 15: Struktur Data, Modul 20 \& 30: Proyek) yang modul tertulisnya dapat dikembangkan di semester mendatang.
+\end{catatan}
+
+\section{Keselamatan Kerja, Etika, dan K3 di Laboratorium}
+
+\begin{itemize}[leftmargin=*]
+  \item Patuhi tata tertib laboratorium; hindari makan/minuman di dekat perangkat.
+  \item Periksa kabel dan ventilasi; laporkan kerusakan ke petugas.
+  \item \textbf{Lisensi perangkat lunak:} gunakan kompilator dan editor sesuai kebijakan prodi.
+  \item \textbf{Etika akademik:} tidak plagiat; kutip sumber jika adaptasi contoh dari web.
+\end{itemize}
+
+\section{Petunjuk Penggunaan Modul dan Pengumpulan Tugas}
+
+\begin{enumerate}[leftmargin=*]
+  \item Baca kotak \textbf{Sub-CPMK} setiap bab sebelum praktikum.
+  \item Kerjakan \textbf{aktivitas}, \textbf{latihan}, dan unggah artefak sesuai Lampiran F.
+  \item Konvensi penamaan (placeholder): \texttt{NIM\_TIF1xx\_M\textit{nn}\_tugas.c}
+  \item Rujuk \textbf{Lampiran} untuk rubrik, bobot semester, dan glosarium.
+\end{enumerate}
+
+\section{Tujuan Modul Praktikum}
+
+\begin{itemize}[leftmargin=*]
+  \item Mengompilasi dan menjalankan program C konsol dengan peringatan minimal (\texttt{-Wall -Wextra}).
+  \item Mengimplementasikan algoritme dengan percabangan, perulangan, fungsi, rekursi, dan data agregat.
+  \item Mengelola memori secara manual (pointer, alokasi dinamis) dengan benar.
+  \item Mengorganisasi proyek multi-berkas sederhana dengan \texttt{Makefile} dan dokumentasi singkat.
+  \item Mengimplementasikan struktur data dasar (linked list, stack, queue) menggunakan pointer.
+\end{itemize}
+
+\section{Keterkaitan dengan RPS Berbasis OBE}
+
+Modul ini memetakan ke \texttt{silabus\_praktikum\_c.tex}: setiap bab berisi Sub-CPMK, makro sesi praktikum, sarana/prasarana, prosedur kerja, referensi dari \texttt{sumber\_materi.md}, aktivitas, latihan, asesmen formatif, checklist. Materi lanjutan (Modul 16--30) tersedia di \texttt{sumber\_materi.md} untuk pengayaan mandiri atau semester berikutnya.
+
+\begin{rangkuman}
+Bab 0 menyampaikan identitas MK, CPL/CPMK (8 CPMK), pemetaan Sub-CPMK, jadwal sinkron RPS (16 minggu), K3/etika, dan petunjuk pengumpulan.
+
+\textbf{Poin kunci:} OBE; 8 CPMK; Sub-CPMK terukur; dokumentasikan pekerjaan; patuhi K3; 30 modul materi tersedia di \texttt{sumber\_materi.md}.
+
+\textbf{Kata kunci:} OBE, Sub-CPMK, CPMK, CPL, RPS, K3, bahasa C
+\end{rangkuman}
+
+\end{document}

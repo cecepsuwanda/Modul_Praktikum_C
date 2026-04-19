@@ -1,0 +1,464 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{2}}{}
+\begin{document}
+
+\chapter{Tipe Data, Operator, dan Masukan/Keluaran Format}
+
+\begin{subcpmk}
+  \item Sub-CPMK 1.2: Tipe, literal, operator aritmatika dan logika
+  \item Sub-CPMK 1.3: \texttt{printf} dan \texttt{scanf} dengan spesifikasi format serta validasi sederhana
+\end{subcpmk}
+
+\SesiRPS{3}{1.2--1.3}{$\sim$170 menit}{CPMK-1}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+
+Sama Bab 1; pastikan locale numerik tidak mengganggu (catatan: desimal titik vs koma pada lingkungan tertentu).
+
+% ============================================================
+\section{Variabel dan Deklarasi}
+% ============================================================
+
+Variabel adalah lokasi penyimpanan bernama di dalam memori yang menyimpan nilai dengan tipe tertentu. Dalam C, setiap variabel \textbf{harus dideklarasikan} sebelum digunakan --- deklarasi memberitahu kompilator berapa banyak memori yang dibutuhkan dan operasi apa yang sah dilakukan terhadap variabel tersebut. Deklarasi dapat digabungkan dengan inisialisasi (pemberian nilai awal), yang merupakan praktik yang sangat disarankan untuk menghindari bug dari variabel yang berisi nilai sampah (\textit{garbage value}).
+
+Aturan penamaan variabel (identifier) dalam C: harus diawali huruf atau garis bawah (\texttt{\_}), dapat mengandung huruf, angka, dan garis bawah, bersifat \textit{case-sensitive} (\texttt{umur} berbeda dengan \texttt{Umur}), dan tidak boleh menggunakan kata kunci C (\texttt{int}, \texttt{return}, \texttt{if}, dll.). Konvensi yang umum digunakan di C adalah \texttt{snake\_case} (huruf kecil dengan garis bawah pemisah, misalnya \texttt{jumlah\_mahasiswa}).
+
+\begin{lstlisting}[language=C,caption=Deklarasi dan inisialisasi variabel]
+#include <stdio.h>
+
+int main(void) {
+    int umur = 20;              // deklarasi + inisialisasi
+    double ipk;                 // deklarasi tanpa inisialisasi
+    char inisial = 'A';         // karakter tunggal
+    
+    ipk = 3.75;                 // inisialisasi terpisah
+    
+    printf("Umur: %d\n", umur);
+    printf("IPK: %.2f\n", ipk);
+    printf("Inisial: %c\n", inisial);
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Tipe Data Dasar}
+% ============================================================
+
+C menyediakan beberapa tipe data dasar (\textit{primitive types}) yang masing-masing memiliki ukuran dan rentang nilai berbeda tergantung pada arsitektur sistem. Tipe data menentukan bagaimana bit-bit di memori diinterpretasikan --- misalnya, empat byte yang sama bisa dibaca sebagai bilangan bulat \texttt{int} atau sebagai bilangan titik-mengambang \texttt{float} dengan nilai yang sangat berbeda. Pemilihan tipe data yang tepat penting untuk efisiensi memori dan kebenaran program.
+
+Kita dapat menggunakan operator \texttt{sizeof} untuk mengetahui ukuran (dalam byte) dari suatu tipe data atau variabel pada platform tertentu. Nilai yang dikembalikan \texttt{sizeof} bertipe \texttt{size\_t} (bilangan bulat tak bertanda).
+
+\begin{tabular}{|l|c|l|l|}
+\hline
+\textbf{Tipe Data} & \textbf{Ukuran (tipikal)} & \textbf{Rentang (tipikal)} & \textbf{Format} \\
+\hline
+\texttt{char} & 1 byte & $-128$ s.d. $127$ (atau 0--255) & \texttt{\%c} \\
+\hline
+\texttt{short} & 2 byte & $-32\,768$ s.d. $32\,767$ & \texttt{\%hd} \\
+\hline
+\texttt{int} & 4 byte & $\pm 2{,}1 \times 10^{9}$ & \texttt{\%d} \\
+\hline
+\texttt{long} & 4/8 byte & $\pm 2{,}1 \times 10^{9}$ / $\pm 9{,}2 \times 10^{18}$ & \texttt{\%ld} \\
+\hline
+\texttt{long long} & 8 byte & $\pm 9{,}2 \times 10^{18}$ & \texttt{\%lld} \\
+\hline
+\texttt{float} & 4 byte & $\pm 3{,}4 \times 10^{38}$ (presisi $\sim$7 digit) & \texttt{\%f} \\
+\hline
+\texttt{double} & 8 byte & $\pm 1{,}7 \times 10^{308}$ (presisi $\sim$15 digit) & \texttt{\%lf}/\texttt{\%f} \\
+\hline
+\texttt{unsigned int} & 4 byte & $0$ s.d. $4{,}3 \times 10^{9}$ & \texttt{\%u} \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Menampilkan ukuran tipe data dengan \texttt{sizeof}]
+#include <stdio.h>
+
+int main(void) {
+    printf("char    : %zu byte\n", sizeof(char));
+    printf("int     : %zu byte\n", sizeof(int));
+    printf("long    : %zu byte\n", sizeof(long));
+    printf("float   : %zu byte\n", sizeof(float));
+    printf("double  : %zu byte\n", sizeof(double));
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+Contoh berikut menggabungkan berbagai tipe data (\texttt{int}, \texttt{unsigned}, \texttt{byte}, \texttt{real}, \texttt{string}) dalam satu program --- konversi langsung dari Pascal \texttt{demo\_tipe\_data.pas}.
+\end{catatan}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/demo\_tipe\_data.c} --- Demonstrasi berbagai tipe data (konversi Pascal)}]{../contoh_code/c/demo_tipe_data.c}
+
+% ============================================================
+\section{Konstanta dan Literal}
+% ============================================================
+
+Konstanta adalah nilai yang tidak dapat diubah setelah ditetapkan. Dalam C, ada dua cara mendefinisikan konstanta: menggunakan \texttt{\#define} (makro praprosesor, tanpa tipe) atau menggunakan kata kunci \texttt{const} (variabel hanya-baca, memiliki tipe). Penggunaan \texttt{const} lebih disarankan karena lebih aman --- kompilator dapat memeriksa tipe datanya.
+
+Literal adalah nilai tetap yang ditulis langsung dalam kode. Contoh: \texttt{42} (integer literal), \texttt{3.14} (floating-point literal), \texttt{'A'} (character literal), dan \texttt{"Hello"} (string literal).
+
+\begin{lstlisting}[language=C,caption=Konstanta dan literal]
+#include <stdio.h>
+
+#define PI 3.14159265    // makro praprosesor (tanpa tipe)
+
+int main(void) {
+    const int MAKS_SISWA = 40;     // konstanta bertipe
+    const double GRAVITASI = 9.8;
+    
+    printf("Pi = %.4f\n", PI);
+    printf("Maks siswa = %d\n", MAKS_SISWA);
+    printf("Gravitasi = %.1f m/s^2\n", GRAVITASI);
+    
+    // MAKS_SISWA = 50;  // ERROR! tidak bisa diubah
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Escape Sequences}
+% ============================================================
+
+\textit{Escape sequence} adalah karakter khusus yang diawali tanda \textit{backslash} (\texttt{\textbackslash}) yang digunakan untuk merepresentasikan karakter non-cetak atau karakter khusus dalam string. Escape sequence diproses oleh kompilator saat menghasilkan kode, bukan saat \textit{runtime}.
+
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Sequence} & \textbf{Nama} & \textbf{Keterangan} \\
+\hline
+\texttt{\textbackslash n} & Newline & Pindah ke baris baru \\
+\hline
+\texttt{\textbackslash t} & Tab & Tab horizontal \\
+\hline
+\texttt{\textbackslash\textbackslash} & Backslash & Mencetak karakter \texttt{\textbackslash} \\
+\hline
+\texttt{\textbackslash '} & Single quote & Mencetak tanda kutip tunggal \\
+\hline
+\texttt{\textbackslash "} & Double quote & Mencetak tanda kutip ganda \\
+\hline
+\texttt{\textbackslash 0} & Null & Karakter null (terminator string) \\
+\hline
+\texttt{\textbackslash a} & Alert/Bell & Bunyi bel (jika didukung terminal) \\
+\hline
+\end{tabular}
+
+% ============================================================
+\section{Operator}
+% ============================================================
+
+Operator adalah simbol yang memberitahu kompilator untuk melakukan operasi tertentu terhadap satu atau lebih operand. C memiliki kumpulan operator yang sangat kaya, yang merupakan salah satu kekuatan bahasa ini untuk pemrograman tingkat rendah. Operator dibagi menjadi beberapa kategori berdasarkan fungsinya: aritmatika untuk perhitungan matematika, relasional untuk membandingkan nilai, logika untuk menggabungkan kondisi boolean, dan assignment untuk memberi atau mengubah nilai variabel.
+
+Setiap operator memiliki \textbf{precedence} (urutan prioritas) dan \textbf{associativity} (arah evaluasi) yang menentukan bagaimana ekspresi kompleks dievaluasi. Jika ragu, gunakan tanda kurung \texttt{()} untuk memperjelas urutan evaluasi --- ini juga meningkatkan keterbacaan kode.
+
+\subsection{Operator Aritmatika}
+
+\begin{tabular}{|c|l|l|l|}
+\hline
+\textbf{Operator} & \textbf{Nama} & \textbf{Contoh} & \textbf{Hasil} \\
+\hline
+\texttt{+} & Penjumlahan & \texttt{5 + 3} & \texttt{8} \\
+\hline
+\texttt{-} & Pengurangan & \texttt{5 - 3} & \texttt{2} \\
+\hline
+\texttt{*} & Perkalian & \texttt{5 * 3} & \texttt{15} \\
+\hline
+\texttt{/} & Pembagian & \texttt{7 / 2} & \texttt{3} (integer!) \\
+\hline
+\texttt{\%} & Modulus (sisa bagi) & \texttt{7 \% 2} & \texttt{1} \\
+\hline
+\end{tabular}
+
+\begin{catatan}
+\textbf{Pembagian integer:} ketika kedua operand bertipe \texttt{int}, hasil pembagian juga \texttt{int} (bagian desimal dibuang). Untuk mendapatkan hasil desimal, setidaknya salah satu operand harus bertipe \texttt{float} atau \texttt{double}:
+
+\texttt{7 / 2} menghasilkan \texttt{3}, tetapi \texttt{7.0 / 2} menghasilkan \texttt{3.5}.
+\end{catatan}
+
+\subsection{Operator Relasional dan Logika}
+
+\begin{tabular}{|c|l||c|l|}
+\hline
+\multicolumn{2}{|c||}{\textbf{Relasional}} & \multicolumn{2}{c|}{\textbf{Logika}} \\
+\hline
+\texttt{==} & Sama dengan & \texttt{\&\&} & AND (dan) \\
+\hline
+\texttt{!=} & Tidak sama & \texttt{||} & OR (atau) \\
+\hline
+\texttt{>} & Lebih besar & \texttt{!} & NOT (negasi) \\
+\hline
+\texttt{<} & Lebih kecil & & \\
+\hline
+\texttt{>=} & Lebih besar atau sama & & \\
+\hline
+\texttt{<=} & Lebih kecil atau sama & & \\
+\hline
+\end{tabular}
+
+\subsection{Operator Assignment dan Increment/Decrement}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Operator} & \textbf{Contoh} & \textbf{Setara dengan} \\
+\hline
+\texttt{=} & \texttt{x = 5} & Memberikan nilai 5 ke x \\
+\hline
+\texttt{+=} & \texttt{x += 3} & \texttt{x = x + 3} \\
+\hline
+\texttt{-=} & \texttt{x -= 3} & \texttt{x = x - 3} \\
+\hline
+\texttt{*=} & \texttt{x *= 3} & \texttt{x = x * 3} \\
+\hline
+\texttt{/=} & \texttt{x /= 3} & \texttt{x = x / 3} \\
+\hline
+\texttt{\%=} & \texttt{x \%= 3} & \texttt{x = x \% 3} \\
+\hline
+\texttt{++} & \texttt{x++} / \texttt{++x} & Post-increment / Pre-increment \\
+\hline
+\texttt{--} & \texttt{x--} / \texttt{--x} & Post-decrement / Pre-decrement \\
+\hline
+\end{tabular}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/assignment\_real.c} --- Assignment dan operasi aritmatika bilangan real (konversi Pascal)}]{../contoh_code/c/assignment_real.c}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/operasi\_boolean\_dan\_numerik.c} --- Tabel kebenaran dan operasi numerik (konversi Pascal)}]{../contoh_code/c/operasi_boolean_dan_numerik.c}
+
+\subsection{Operator Ternary}
+
+Operator ternary (\texttt{? :}) adalah bentuk ringkas dari \texttt{if-else} untuk ekspresi sederhana:
+
+\begin{lstlisting}[language=C,caption=Operator ternary]
+int skor = 75;
+char *status = (skor >= 60) ? "Lulus" : "Tidak Lulus";
+printf("%s\n", status);  // Output: Lulus
+\end{lstlisting}
+
+% ============================================================
+\section{Type Casting (Konversi Tipe)}
+% ============================================================
+
+Konversi tipe terjadi ketika nilai dari satu tipe data diubah ke tipe data lain. C melakukan konversi \textbf{implisit} secara otomatis ketika mencampur tipe dalam ekspresi (misalnya \texttt{int} dengan \texttt{double}) --- tipe yang lebih kecil dipromosikan ke tipe yang lebih besar. Konversi \textbf{eksplisit} dilakukan oleh programmer menggunakan operator \textit{cast} \texttt{(tipe)} untuk mengendalikan hasilnya secara langsung.
+
+\begin{lstlisting}[language=C,caption=Type casting implisit dan eksplisit]
+#include <stdio.h>
+
+int main(void) {
+    int a = 7, b = 2;
+    
+    // Pembagian integer (implisit: hasil int)
+    printf("7 / 2 = %d\n", a / b);            // Output: 3
+    
+    // Cast eksplisit untuk hasil desimal
+    printf("7 / 2 = %.2f\n", (double)a / b);   // Output: 3.50
+    
+    // Konversi implisit: int -> double
+    double hasil = a + 0.5;    // a dipromosikan ke double
+    printf("Hasil = %.2f\n", hasil);            // Output: 7.50
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Masukan/Keluaran Terformat (\texttt{printf} dan \texttt{scanf})}
+% ============================================================
+
+Fungsi \texttt{printf()} dan \texttt{scanf()} dari pustaka \texttt{<stdio.h>} adalah mekanisme utama I/O dalam C. Keduanya menggunakan \textit{format string} yang berisi teks biasa dicampur dengan \textit{format specifier} (diawali \texttt{\%}) yang menentukan bagaimana argumen ditampilkan atau dibaca. Memahami format specifier dengan benar adalah keterampilan fundamental yang akan digunakan di setiap program C.
+
+Penting untuk selalu memeriksa \textbf{nilai balik} \texttt{scanf()}: fungsi ini mengembalikan jumlah item yang berhasil dibaca. Jika pengguna memasukkan data yang tidak sesuai format, \texttt{scanf} akan mengembalikan nilai kurang dari yang diharapkan, dan program harus menangani kondisi ini untuk menghindari perilaku tidak terdefinisi.
+
+\subsection{Tabel Format Specifier Lengkap}
+
+{\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}X|@{}}
+\hline
+\textbf{Specifier} & \textbf{Tipe} & \textbf{Keterangan} & \textbf{Contoh} \\
+\hline
+\texttt{\%d} & \texttt{int} & Bilangan bulat desimal & \texttt{printf("\%d", 42)} \\
+\hline
+\texttt{\%u} & \texttt{unsigned int} & Bilangan tak bertanda & \texttt{printf("\%u", 42u)} \\
+\hline
+\texttt{\%ld} & \texttt{long} & Long integer & \texttt{printf("\%ld", 42L)} \\
+\hline
+\texttt{\%lld} & \texttt{long long} & Long long integer & \texttt{printf("\%lld", 42LL)} \\
+\hline
+\texttt{\%f} & \texttt{float/double} & Titik-mengambang (printf) & \texttt{printf("\%f", 3.14)} \\
+\hline
+\texttt{\%lf} & \texttt{double} & Double (scanf wajib \texttt{lf}) & \texttt{scanf("\%lf", \&x)} \\
+\hline
+\texttt{\%.2f} & \texttt{double} & 2 digit desimal & \texttt{printf("\%.2f", 3.14159)} \\
+\hline
+\texttt{\%c} & \texttt{char} & Satu karakter & \texttt{printf("\%c", 'A')} \\
+\hline
+\texttt{\%s} & \texttt{char*} & String (hati-hati overflow!) & \texttt{printf("\%s", "Hi")} \\
+\hline
+\texttt{\%x} & \texttt{int} & Heksadesimal (huruf kecil) & \texttt{printf("\%x", 255)} \\
+\hline
+\texttt{\%o} & \texttt{int} & Oktal & \texttt{printf("\%o", 8)} \\
+\hline
+\texttt{\%p} & pointer & Alamat memori & \texttt{printf("\%p", \&x)} \\
+\hline
+\texttt{\%zu} & \texttt{size\_t} & Hasil \texttt{sizeof} & \texttt{printf("\%zu", sizeof(int))} \\
+\end{tabularx}
+}
+\par
+\subsection{Format Output: Lebar dan Presisi}
+
+\begin{lstlisting}[language=C,caption=Pengaturan lebar dan presisi output]
+#include <stdio.h>
+
+int main(void) {
+    int   n = 42;
+    double pi = 3.14159265;
+    
+    // Lebar minimum 10 karakter, rata kanan (default)
+    printf("[%10d]\n", n);        // [        42]
+    
+    // Rata kiri dengan tanda minus
+    printf("[%-10d]\n", n);       // [42        ]
+    
+    // Padding nol
+    printf("[%010d]\n", n);       // [0000000042]
+    
+    // Presisi: 2 digit desimal
+    printf("[%.2f]\n", pi);       // [3.14]
+    
+    // Lebar 10, presisi 3
+    printf("[%10.3f]\n", pi);     // [     3.142]
+    
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{Penggunaan \texttt{scanf} yang Aman}
+
+\begin{lstlisting}[language=C,caption=Validasi input dengan \texttt{scanf}]
+#include <stdio.h>
+
+int main(void) {
+    int umur;
+    double ipk;
+    
+    printf("Masukkan umur dan IPK: ");
+    
+    // scanf mengembalikan jumlah item yang berhasil dibaca
+    if (scanf("%d %lf", &umur, &ipk) != 2) {
+        printf("Error: input tidak valid.\n");
+        return 1;
+    }
+    
+    // Validasi rentang
+    if (umur < 0 || umur > 150) {
+        printf("Error: umur tidak wajar.\n");
+        return 1;
+    }
+    
+    printf("Umur = %d tahun, IPK = %.2f\n", umur, ipk);
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+\textbf{Keamanan \texttt{scanf}:} Jangan pernah menggunakan \texttt{scanf("\%s", buf)} tanpa membatasi lebar, karena dapat menyebabkan \textit{buffer overflow}. Gunakan \texttt{scanf("\%15s", buf)} untuk membatasi maksimum 15 karakter (buffer harus berukuran minimal 16 untuk terminator nol).
+\end{catatan}
+
+% ============================================================
+\section{Studi Kasus: Kalkulator Sederhana}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Kalkulator dua bilangan]
+#include <stdio.h>
+
+int main(void) {
+    double a, b;
+    char op;
+    
+    printf("Masukkan ekspresi (contoh: 5 + 3): ");
+    if (scanf("%lf %c %lf", &a, &op, &b) != 3) {
+        printf("Format input salah.\n");
+        return 1;
+    }
+    
+    switch (op) {
+        case '+': printf("Hasil: %.2f\n", a + b); break;
+        case '-': printf("Hasil: %.2f\n", a - b); break;
+        case '*': printf("Hasil: %.2f\n", a * b); break;
+        case '/':
+            if (b == 0.0) {
+                printf("Error: pembagian oleh nol!\n");
+                return 1;
+            }
+            printf("Hasil: %.2f\n", a / b);
+            break;
+        case '%':
+            printf("Hasil: %d\n", (int)a % (int)b);
+            break;
+        default:
+            printf("Operator '%c' tidak dikenal.\n", op);
+            return 1;
+    }
+    return 0;
+}
+\end{lstlisting}
+
+Program di atas menggabungkan beberapa konsep yang telah dipelajari: deklarasi variabel bertipe berbeda (\texttt{double} dan \texttt{char}), input terformat dengan \texttt{scanf}, validasi nilai balik \texttt{scanf}, operator aritmatika, konversi tipe eksplisit (\texttt{(int)a}), dan struktur \texttt{switch} (yang akan diperdalam pada Bab 3). Perhatikan penanganan khusus untuk pembagian oleh nol --- ini merupakan praktik defensif yang penting.
+
+% ============================================================
+\section{Contoh Kode Konversi: Masukan dan Keluaran Berbagai Tipe}
+% ============================================================
+
+Contoh berikut mendemonstrasikan pembacaan berbagai tipe data (integer, real, karakter, string) menggunakan \texttt{scanf} dan pencetakan ulangnya --- konversi dari Pascal \texttt{baca\_tulis.pas}.
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/baca\_tulis.c} --- Membaca dan menulis berbagai tipe data (konversi Pascal)}]{../contoh_code/c/baca_tulis.c}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+
+\begin{itemize}[leftmargin=*]
+  \item cppreference, \texttt{printf}/\texttt{scanf}. \url{https://en.cppreference.com/w/c/io/fprintf}
+  \item Programiz, \textit{C Programming}. \url{https://www.programiz.com/c-programming}
+  \item Petani Kode, variabel dan tipe. \url{https://petanikode.com/tutorial/c}
+  \item W3Schools, \textit{C Data Types}. \url{https://www.w3schools.com/c/c_data_types.php}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Buat program yang membaca dua bilangan bulat dan menampilkan jumlah, selisih, hasil kali, dan sisa bagi.
+  \item Tambahkan pengecekan nilai balik \texttt{scanf} pada setiap operasi input.
+  \item Buat program yang menampilkan ukuran semua tipe data dasar menggunakan \texttt{sizeof}.
+  \item Eksperimen: apa yang terjadi jika Anda memformat \texttt{int} dengan \texttt{\%f}? Mengapa?
+\end{aktivitas}
+
+\begin{latihan}
+  \item Mengapa \texttt{\&} diperlukan pada \texttt{scanf} untuk variabel skalar?
+  \item Jelaskan risiko \texttt{scanf("\%s", buf)} tanpa lebar maksimum.
+  \item Apa perbedaan \texttt{\%f} dan \texttt{\%lf} pada \texttt{printf} vs \texttt{scanf}?
+  \item Mengapa \texttt{7 / 2} menghasilkan \texttt{3} dan bukan \texttt{3.5}?
+  \item Apa perbedaan \texttt{++x} dan \texttt{x++}?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M2:} program kalkulator sederhana dua bilangan dengan menu operasi (+, -, *, /, \%); unggah \texttt{.c} dan cuplikan uji (screenshot terminal dengan minimal 3 kasus uji berbeda).
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya dapat mendeklarasikan variabel dengan tipe data yang tepat
+  \item Saya memahami perbedaan \texttt{int}, \texttt{float}, \texttt{double}, dan \texttt{char}
+  \item Saya dapat memformat keluaran dengan \texttt{printf} (lebar, presisi)
+  \item Saya dapat membaca input dengan \texttt{scanf} aman untuk skalar
+  \item Saya memahami konversi tipe implisit dan eksplisit
+  \item Saya memahami precedence operator dasar
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas variabel dan aturan penamaan, tipe data dasar C (\texttt{int}, \texttt{double}, \texttt{char}, dan variasinya) beserta ukurannya, konstanta (\texttt{const} dan \texttt{\#define}), escape sequences, operator (aritmatika, relasional, logika, assignment, ternary), type casting, serta I/O terformat dengan \texttt{printf}/\texttt{scanf}.
+
+\textbf{Poin kunci:} pembagian integer membuang desimal; selalu cek nilai balik \texttt{scanf}; gunakan \texttt{const} daripada \texttt{\#define} jika mungkin; perhatikan tipe data saat mencampur operand.
+
+\textbf{Kata kunci:} \texttt{int}, \texttt{double}, \texttt{char}, \texttt{sizeof}, type casting, \texttt{printf}, \texttt{scanf}, format specifier, operator precedence
+\end{rangkuman}
+
+\end{document}

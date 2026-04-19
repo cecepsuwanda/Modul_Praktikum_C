@@ -1,0 +1,306 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{7}}{}
+\begin{document}
+
+\chapter{Larik Satu dan Dua Dimensi}
+
+\begin{subcpmk}
+  \item Sub-CPMK 4.1: Larik 1D/2D, iterasi elemen dengan aman (batas indeks)
+  \item Sub-CPMK 4.3: Pencarian linear dan pengurutan sederhana (bubble sort)
+\end{subcpmk}
+
+\SesiRPS{8}{4.1, 4.3}{$\sim$170 menit}{CPMK-4}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+Sama bab sebelumnya.
+
+% ============================================================
+\section{Konsep Array}
+% ============================================================
+
+Array (larik) adalah kumpulan elemen bertipe sama yang disimpan dalam \textbf{blok memori berurutan} (\textit{contiguous}). Setiap elemen diakses melalui \textbf{indeks} yang dimulai dari \texttt{0} (bukan \texttt{1}). Array sangat penting dalam pemrograman karena memungkinkan kita menyimpan dan memproses sekumpulan data menggunakan loop, tanpa harus mendeklarasikan variabel terpisah untuk setiap elemen.
+
+Dalam C, ukuran array statis harus ditentukan saat kompilasi (kecuali VLA di C99). C \textbf{tidak memeriksa batas indeks} secara otomatis --- mengakses elemen di luar batas (\textit{out-of-bounds access}) menyebabkan \textit{undefined behavior}, yang merupakan salah satu sumber bug paling berbahaya dalam C. Menjaga agar indeks selalu dalam rentang $[0, n-1]$ adalah tanggung jawab programmer.
+
+\begin{konsep}
+\textbf{Representasi memori array \texttt{int arr[5] = \{10,20,30,40,50\}}:}
+
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\texttt{arr[0]} & \texttt{arr[1]} & \texttt{arr[2]} & \texttt{arr[3]} & \texttt{arr[4]} \\
+\hline
+10 & 20 & 30 & 40 & 50 \\
+\hline
+\multicolumn{5}{|c|}{$\underbrace{\hspace{6cm}}_{5 \times \texttt{sizeof(int)}}$ byte berurutan di memori} \\
+\hline
+\end{tabular}
+\end{konsep}
+
+% ============================================================
+\section{Array Satu Dimensi}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Deklarasi dan operasi array 1D]
+#include <stdio.h>
+
+int main(void) {
+    // Deklarasi dan inisialisasi
+    int nilai[5] = {85, 92, 78, 96, 88};
+    int n = 5;
+    
+    // Iterasi: tampilkan semua elemen
+    printf("Nilai: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", nilai[i]);
+    }
+    printf("\n");
+    
+    // Hitung rata-rata
+    int total = 0;
+    for (int i = 0; i < n; i++) {
+        total += nilai[i];
+    }
+    double rata = (double)total / n;
+    printf("Rata-rata: %.2f\n", rata);
+    
+    // Cari nilai tertinggi
+    int maks = nilai[0];
+    for (int i = 1; i < n; i++) {
+        if (nilai[i] > maks) {
+            maks = nilai[i];
+        }
+    }
+    printf("Nilai tertinggi: %d\n", maks);
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/array\_isi\_cetak.c} --- Mengisi dan mencetak array dengan \texttt{while}+\texttt{for} (konversi Pascal)}]{../contoh_code/c/array_isi_cetak.c}
+
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Inisialisasi} & \textbf{Keterangan} \\
+\hline
+\texttt{int a[5] = \{1,2,3,4,5\}} & Ukuran eksplisit, semua elemen diisi \\
+\hline
+\texttt{int a[] = \{1,2,3\}} & Ukuran otomatis dari jumlah elemen (3) \\
+\hline
+\texttt{int a[5] = \{1,2\}} & Sisa elemen diisi 0 (\texttt{a = \{1,2,0,0,0\}}) \\
+\hline
+\texttt{int a[5] = \{0\}} & Semua elemen diisi 0 \\
+\hline
+\texttt{int a[5]} & \textbf{Tidak diinisialisasi} --- berisi garbage! \\
+\hline
+\end{tabular}
+
+% ============================================================
+\section{Array sebagai Parameter Fungsi}
+% ============================================================
+
+Ketika array dikirim ke fungsi, yang dikirim sebenarnya adalah \textbf{pointer} ke elemen pertama (array ``decay'' menjadi pointer). Artinya, fungsi dapat mengubah isi array asli. Karena informasi ukuran hilang, kita biasanya mengirim parameter tambahan \texttt{int n} untuk jumlah elemen.
+
+\begin{lstlisting}[language=C,caption=Array sebagai parameter fungsi]
+#include <stdio.h>
+
+void cetak_array(const int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int cari_max(const int arr[], int n) {
+    int maks = arr[0];
+    for (int i = 1; i < n; i++) {
+        if (arr[i] > maks) maks = arr[i];
+    }
+    return maks;
+}
+
+int main(void) {
+    int data[] = {45, 12, 89, 33, 67};
+    int n = sizeof(data) / sizeof(data[0]);  // hitung jumlah elemen
+    
+    cetak_array(data, n);
+    printf("Max: %d\n", cari_max(data, n));
+    
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+\texttt{sizeof(data)/sizeof(data[0])} menghitung jumlah elemen array --- tetapi \textbf{hanya bekerja} pada array yang dideklarasikan di scope yang sama, bukan pada parameter fungsi (di sana, array sudah menjadi pointer).
+\end{catatan}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/array\_prosedur.c} --- Fungsi \texttt{isi} dan \texttt{cetak} untuk array (konversi Pascal)}]{../contoh_code/c/array_prosedur.c}
+
+% ============================================================
+\section{Array Dua Dimensi (Matriks)}
+% ============================================================
+
+Array 2D disimpan sebagai ``array of arrays'' dalam memori secara \textit{row-major} (baris demi baris). Deklarasi \texttt{int m[BARIS][KOLOM]} mengalokasikan \texttt{BARIS $\times$ KOLOM} elemen secara berurutan.
+
+\begin{lstlisting}[language=C,caption=Penjumlahan dua matriks $2\times 3$]
+#include <stdio.h>
+
+#define BARIS 2
+#define KOLOM 3
+
+void cetak_matriks(int m[BARIS][KOLOM]) {
+    for (int i = 0; i < BARIS; i++) {
+        for (int j = 0; j < KOLOM; j++) {
+            printf("%4d", m[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main(void) {
+    int A[BARIS][KOLOM] = {{1, 2, 3}, {4, 5, 6}};
+    int B[BARIS][KOLOM] = {{7, 8, 9}, {10, 11, 12}};
+    int C[BARIS][KOLOM];
+    
+    // Penjumlahan matriks
+    for (int i = 0; i < BARIS; i++) {
+        for (int j = 0; j < KOLOM; j++) {
+            C[i][j] = A[i][j] + B[i][j];
+        }
+    }
+    
+    printf("Matriks A:\n"); cetak_matriks(A);
+    printf("\nMatriks B:\n"); cetak_matriks(B);
+    printf("\nA + B:\n"); cetak_matriks(C);
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/matriks\_3x3.c} --- Input dan cetak matriks $3\times 3$ (konversi Pascal)}]{../contoh_code/c/matriks_3x3.c}
+
+% ============================================================
+\section{Pencarian Linear}
+% ============================================================
+
+Pencarian linear (\textit{linear search}) memeriksa setiap elemen satu per satu dari awal hingga akhir. Algoritma ini sederhana dan bekerja pada array apa pun (terurut maupun tidak), namun memiliki kompleksitas \textbf{O(n)} --- lambat untuk array besar.
+
+\begin{lstlisting}[language=C,caption=Pencarian linear]
+#include <stdio.h>
+
+int cari_linear(const int arr[], int n, int target) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == target) {
+            return i;  // ditemukan di indeks i
+        }
+    }
+    return -1;  // tidak ditemukan
+}
+
+int main(void) {
+    int data[] = {45, 12, 89, 33, 67, 21};
+    int n = sizeof(data) / sizeof(data[0]);
+    int target = 33;
+    
+    int hasil = cari_linear(data, n, target);
+    if (hasil != -1) {
+        printf("%d ditemukan di indeks %d\n", target, hasil);
+    } else {
+        printf("%d tidak ditemukan\n", target);
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Pengurutan Sederhana: Bubble Sort}
+% ============================================================
+
+Bubble sort membandingkan pasangan elemen bersebelahan dan menukarnya jika tidak terurut. Proses diulang hingga seluruh array terurut. Meskipun sederhana untuk dipahami, bubble sort memiliki kompleksitas \textbf{O(n\textsuperscript{2})} dan tidak efisien untuk data besar --- di dunia nyata, gunakan \texttt{qsort()} dari \texttt{<stdlib.h>}.
+
+\begin{lstlisting}[language=C,caption=Bubble sort ascending]
+#include <stdio.h>
+
+void bubble_sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int sudah_terurut = 1;  // optimasi: deteksi awal
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Tukar
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                sudah_terurut = 0;
+            }
+        }
+        if (sudah_terurut) break;  // sudah terurut, berhenti
+    }
+}
+
+int main(void) {
+    int data[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(data) / sizeof(data[0]);
+    
+    printf("Sebelum: ");
+    for (int i = 0; i < n; i++) printf("%d ", data[i]);
+    
+    bubble_sort(data, n);
+    
+    printf("\nSesudah: ");
+    for (int i = 0; i < n; i++) printf("%d ", data[i]);
+    printf("\n");
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item cppreference, array. \url{https://en.cppreference.com/w/c/language/array}
+  \item Programiz, \textit{C Arrays}. \url{https://www.programiz.com/c-programming/c-arrays}
+  \item GeeksforGeeks, \textit{Bubble Sort}. \url{https://www.geeksforgeeks.org/bubble-sort-algorithm/}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Implementasikan penjumlahan dua vektor (array 1D) panjang tetap.
+  \item Transpose matriks $2\times 3$ menjadi $3\times 2$.
+  \item Implementasikan pencarian linear pada array dan tampilkan hasilnya.
+  \item Urutkan array bilangan menggunakan bubble sort, cetak sebelum dan sesudah.
+  \item Perhatikan kerangka latihan tabel berikut (konversi dari Pascal \texttt{tabel\_latihan.pas}) --- lengkapi bagian \texttt{fpangkat} dan \texttt{cetak}:
+\end{aktivitas}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/tabel\_latihan.c} --- Latihan: fungsi tabel pangkat (kerangka konversi Pascal)}]{../contoh_code/c/tabel_latihan.c}
+
+\begin{latihan}
+  \item Mengapa indeks array C dimulai dari 0?
+  \item Apa yang terjadi jika mengakses \texttt{arr[10]} pada array berukuran 5?
+  \item Jelaskan mengapa \texttt{sizeof(arr)/sizeof(arr[0])} tidak bekerja di dalam fungsi.
+  \item Berapa perbandingan yang dilakukan bubble sort pada array berukuran $n$?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M6:} manipulasi larik (min/max/rata-rata + pencarian linear + bubble sort) dengan uji kasus batas indeks.
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya menghindari akses di luar batas larik
+  \item Saya dapat mengirim array ke fungsi dengan benar
+  \item Saya memahami indeks $0 \ldots n-1$
+  \item Saya dapat mengimplementasikan pencarian linear
+  \item Saya dapat mengimplementasikan bubble sort
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas array satu dimensi (deklarasi, inisialisasi, iterasi), array dua dimensi (matriks), array sebagai parameter fungsi, pencarian linear O(n), dan bubble sort O(n\textsuperscript{2}).
+
+\textbf{Poin kunci:} indeks $0 \ldots n-1$; array decay menjadi pointer saat dikirim ke fungsi; C tidak cek batas indeks; hitung ukuran dengan \texttt{sizeof} hanya di scope deklarasi.
+
+\textbf{Kata kunci:} array, indeks, iterasi, matriks, pencarian linear, bubble sort, \texttt{sizeof}
+\end{rangkuman}
+
+\end{document}

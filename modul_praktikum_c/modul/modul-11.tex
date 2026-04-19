@@ -1,0 +1,273 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{11}}{}
+\begin{document}
+
+\chapter{Berkas Teks dan Biner dengan API \texttt{FILE}}
+
+\begin{subcpmk}
+  \item Sub-CPMK 7.1: \texttt{fopen}/\texttt{fclose}, mode buka file, \texttt{FILE *}
+  \item Sub-CPMK 7.2: Membaca/menulis file teks dan biner
+  \item Sub-CPMK 7.3: Posisi file (\texttt{fseek}/\texttt{ftell}), penanganan error
+\end{subcpmk}
+
+\SesiRPS{12}{7.1--7.3}{$\sim$170 menit}{CPMK-7}
+
+% ============================================================
+\section{Konsep File I/O}
+% ============================================================
+
+File I/O (\textit{Input/Output}) memungkinkan program menyimpan data secara \textbf{persisten} --- data tetap ada bahkan setelah program berakhir. Dalam C, operasi file dilakukan melalui \textbf{stream}: aliran data antara program dan file di disk. Pustaka \texttt{<stdio.h>} menyediakan tipe \texttt{FILE} dan fungsi-fungsi untuk membuka, membaca, menulis, dan menutup file.
+
+Setiap program C secara otomatis memiliki tiga stream yang sudah terbuka: \texttt{stdin} (input standar, biasanya keyboard), \texttt{stdout} (output standar, biasanya layar), dan \texttt{stderr} (output error). Fungsi \texttt{printf} sebenarnya menulis ke \texttt{stdout}, dan \texttt{scanf} membaca dari \texttt{stdin}. Dengan file I/O, kita menambahkan stream baru yang terhubung ke file di disk.
+
+% ============================================================
+\section{Membuka dan Menutup File}
+% ============================================================
+
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Mode} & \textbf{Keterangan} \\
+\hline
+\texttt{"r"} & Baca teks (\textit{read}). File harus sudah ada. \\
+\hline
+\texttt{"w"} & Tulis teks (\textit{write}). Membuat file baru atau \textbf{menimpa} file lama. \\
+\hline
+\texttt{"a"} & Tambah teks (\textit{append}). Menulis di akhir file. \\
+\hline
+\texttt{"r+"} & Baca dan tulis. File harus sudah ada. \\
+\hline
+\texttt{"w+"} & Baca dan tulis. Membuat baru / menimpa. \\
+\hline
+\texttt{"a+"} & Baca dan tambah di akhir. \\
+\hline
+\texttt{"rb"} & Baca biner. \\
+\hline
+\texttt{"wb"} & Tulis biner. \\
+\hline
+\end{tabular}
+
+\begin{konsep}
+\textbf{Pola standar File I/O:}
+
+\begin{enumerate}[nosep]
+  \item \texttt{fopen()} --- buka file, dapatkan \texttt{FILE *}
+  \item Periksa apakah pointer \texttt{NULL} (file gagal dibuka)
+  \item Baca atau tulis data
+  \item \texttt{fclose()} --- \textbf{selalu} tutup file saat selesai
+\end{enumerate}
+\end{konsep}
+
+% ============================================================
+\section{Membaca File Teks}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Membaca file baris per baris]
+#include <stdio.h>
+
+int main(void) {
+    FILE *fp = fopen("data.txt", "r");
+    
+    if (fp == NULL) {
+        perror("Gagal membuka file");  // cetak pesan error
+        return 1;
+    }
+    
+    char baris[256];
+    int no = 1;
+    
+    while (fgets(baris, sizeof(baris), fp) != NULL) {
+        printf("Baris %d: %s", no, baris);
+        no++;
+    }
+    
+    fclose(fp);  // WAJIB ditutup!
+    return 0;
+}
+\end{lstlisting}
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.0cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{6.5cm}|}
+\hline
+\textbf{Fungsi Baca} & \textbf{Unit} & \textbf{Catatan} \\
+\hline
+\texttt{fgetc(fp)} & 1 karakter & Mengembalikan \texttt{int} (\texttt{EOF} jika selesai) \\
+\hline
+\texttt{fgets(buf, n, fp)} & 1 baris (maks $n-1$ char) & Menyertakan \texttt{\textbackslash n}; aman \\
+\hline
+\texttt{fscanf(fp, fmt, ...)} & Terformat & Seperti \texttt{scanf} tapi dari file \\
+\hline
+\texttt{fread(buf, size, count, fp)} & Blok biner & Untuk file biner \\
+\hline
+\end{tabular}
+}
+
+% ============================================================
+\section{Menulis ke File Teks}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Menulis data ke file]
+#include <stdio.h>
+
+typedef struct {
+    char nama[50];
+    int skor;
+} Siswa;
+
+int main(void) {
+    Siswa daftar[] = {
+        {"Andi", 85}, {"Budi", 92}, {"Cici", 78}
+    };
+    int n = sizeof(daftar) / sizeof(daftar[0]);
+    
+    FILE *fp = fopen("hasil.txt", "w");
+    if (!fp) { perror("Error"); return 1; }
+    
+    fprintf(fp, "%-20s %s\n", "Nama", "Skor");
+    fprintf(fp, "-------------------------\n");
+    for (int i = 0; i < n; i++) {
+        fprintf(fp, "%-20s %d\n", daftar[i].nama, daftar[i].skor);
+    }
+    
+    fclose(fp);
+    printf("Data berhasil ditulis ke hasil.txt\n");
+    return 0;
+}
+\end{lstlisting}
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.0cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{6.5cm}|}
+\hline
+\textbf{Fungsi Tulis} & \textbf{Unit} & \textbf{Catatan} \\
+\hline
+\texttt{fputc(c, fp)} & 1 karakter & \\
+\hline
+\texttt{fputs(str, fp)} & 1 string & Tidak menambah newline otomatis \\
+\hline
+\texttt{fprintf(fp, fmt, ...)} & Terformat & Seperti \texttt{printf} tapi ke file \\
+\hline
+\texttt{fwrite(buf, size, count, fp)} & Blok biner & Untuk file biner \\
+\hline
+\end{tabular}
+}
+
+% ============================================================
+\section{File Biner}
+% ============================================================
+
+File biner menyimpan data dalam format internal komputer (bukan teks yang dapat dibaca manusia). File biner lebih efisien untuk data terstruktur karena tidak perlu konversi format. Gunakan \texttt{fwrite} untuk menulis dan \texttt{fread} untuk membaca.
+
+\begin{lstlisting}[language=C,caption=Menulis dan membaca struct ke/dari file biner]
+#include <stdio.h>
+
+typedef struct {
+    char nama[30];
+    double ipk;
+} Mhs;
+
+int main(void) {
+    // TULIS ke file biner
+    Mhs tulis[] = {{"Andi", 3.5}, {"Budi", 3.8}};
+    FILE *fw = fopen("mhs.dat", "wb");
+    if (!fw) { perror("Error"); return 1; }
+    fwrite(tulis, sizeof(Mhs), 2, fw);
+    fclose(fw);
+    
+    // BACA dari file biner
+    Mhs baca[2];
+    FILE *fr = fopen("mhs.dat", "rb");
+    if (!fr) { perror("Error"); return 1; }
+    size_t dibaca = fread(baca, sizeof(Mhs), 2, fr);
+    fclose(fr);
+    
+    printf("Dibaca %zu record:\n", dibaca);
+    for (size_t i = 0; i < dibaca; i++) {
+        printf("  %s - %.2f\n", baca[i].nama, baca[i].ipk);
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Posisi File dan Penanganan Error}
+% ============================================================
+
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Fungsi} & \textbf{Keterangan} \\
+\hline
+\texttt{ftell(fp)} & Mengembalikan posisi saat ini (byte dari awal) \\
+\hline
+\texttt{fseek(fp, offset, origin)} & Pindah posisi. Origin: \texttt{SEEK\_SET} (awal), \texttt{SEEK\_CUR} (saat ini), \texttt{SEEK\_END} (akhir) \\
+\hline
+\texttt{rewind(fp)} & Kembali ke awal file \\
+\hline
+\texttt{feof(fp)} & Cek apakah sudah di akhir file \\
+\hline
+\texttt{ferror(fp)} & Cek apakah terjadi error pada stream \\
+\hline
+\texttt{perror(msg)} & Cetak pesan error berdasarkan \texttt{errno} \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Menghitung ukuran file dengan \texttt{fseek}/\texttt{ftell}]
+#include <stdio.h>
+
+int main(void) {
+    FILE *fp = fopen("data.txt", "r");
+    if (!fp) { perror("Error"); return 1; }
+    
+    fseek(fp, 0, SEEK_END);     // pindah ke akhir
+    long ukuran = ftell(fp);    // posisi = ukuran file
+    rewind(fp);                 // kembali ke awal
+    
+    printf("Ukuran file: %ld byte\n", ukuran);
+    fclose(fp);
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item cppreference, I/O berkas. \url{https://en.cppreference.com/w/c/io}
+  \item Programiz, \textit{C File Handling}. \url{https://www.programiz.com/c-programming/c-file-input-output}
+  \item Petani Kode, file. \url{https://petanikode.com/tutorial/c}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Buat program yang membaca file teks dan menghitung jumlah baris, kata, dan karakter.
+  \item Buat program yang menulis array of struct ke file teks dengan format tabel.
+  \item Buat program yang menyimpan dan memuat data struct ke/dari file biner.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Apa yang terjadi jika \texttt{fclose} tidak dipanggil?
+  \item Jelaskan perbedaan mode \texttt{"w"} dan \texttt{"a"}.
+  \item Kapan file biner lebih tepat daripada file teks?
+  \item Apa kegunaan \texttt{perror()} dan bagaimana ia bekerja?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M10:} program yang membaca file teks, menghitung jumlah baris, dan menulis ringkasan ke file output baru.
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya selalu memeriksa nilai balik \texttt{fopen} (NULL = gagal)
+  \item Saya selalu menutup file dengan \texttt{fclose}
+  \item Saya dapat membaca dan menulis file teks
+  \item Saya memahami perbedaan file teks dan file biner
+  \item Saya dapat menggunakan \texttt{fseek}/\texttt{ftell} untuk navigasi file
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas file I/O dalam C: membuka file (\texttt{fopen} dengan berbagai mode), membaca (\texttt{fgetc}, \texttt{fgets}, \texttt{fscanf}, \texttt{fread}), menulis (\texttt{fputc}, \texttt{fputs}, \texttt{fprintf}, \texttt{fwrite}), menutup file (\texttt{fclose}), navigasi file (\texttt{fseek}, \texttt{ftell}), dan penanganan error (\texttt{perror}).
+
+\textbf{Poin kunci:} selalu cek \texttt{fopen} NULL; selalu \texttt{fclose}; mode \texttt{"w"} menimpa file; \texttt{fgets} lebih aman dari \texttt{fscanf} untuk baris; file biner untuk data terstruktur.
+
+\textbf{Kata kunci:} \texttt{FILE *}, \texttt{fopen}, \texttt{fclose}, \texttt{fgets}, \texttt{fprintf}, \texttt{fread}, \texttt{fwrite}, \texttt{fseek}, mode buka
+\end{rangkuman}
+
+\end{document}

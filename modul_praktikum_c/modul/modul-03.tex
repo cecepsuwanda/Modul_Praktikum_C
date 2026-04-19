@@ -1,0 +1,381 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{3}}{}
+\begin{document}
+
+\chapter{Struktur Percabangan: \texttt{if}, \texttt{switch}, dan Operator Ternary}
+
+\begin{subcpmk}
+  \item Sub-CPMK 2.1: Merancang percabangan dengan \texttt{if}/\texttt{else if}/\texttt{else}, \texttt{switch}, nested \texttt{if}, dan operator ternary
+\end{subcpmk}
+
+\SesiRPS{4}{2.1}{$\sim$170 menit}{CPMK-2}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+Sama bab sebelumnya.
+
+% ============================================================
+\section{Konsep Percabangan}
+% ============================================================
+
+Percabangan (\textit{branching} atau \textit{conditional statements}) memungkinkan program untuk memilih jalur eksekusi berdasarkan suatu kondisi. Tanpa percabangan, program hanya dapat berjalan secara linier dari atas ke bawah. Dengan percabangan, program menjadi ``cerdas'' --- dapat merespons input pengguna, menangani kasus-kasus berbeda, dan membuat keputusan. Dalam C, kondisi dievaluasi sebagai \textbf{benar} (nilai bukan nol) atau \textbf{salah} (nilai nol).
+
+C menyediakan tiga mekanisme percabangan utama: pernyataan \texttt{if-else} untuk percabangan bersyarat umum, pernyataan \texttt{switch-case} untuk memilih salah satu dari banyak opsi tetap, dan operator ternary (\texttt{? :}) untuk percabangan ringkas dalam ekspresi. Pemilihan mekanisme yang tepat meningkatkan keterbacaan dan efisiensi kode.
+
+% ============================================================
+\section{Pernyataan \texttt{if}}
+% ============================================================
+
+Pernyataan \texttt{if} adalah bentuk percabangan paling dasar. Blok kode di dalamnya hanya dieksekusi jika kondisi bernilai benar (\textit{true}, yaitu bukan nol). Jika kondisi bernilai salah (nol), blok kode dilewati dan eksekusi berlanjut ke pernyataan berikutnya.
+
+\begin{lstlisting}[language=C,caption=Pernyataan \texttt{if} sederhana]
+#include <stdio.h>
+
+int main(void) {
+    int suhu = 38;
+    
+    if (suhu > 37) {
+        printf("Peringatan: suhu tubuh tinggi!\n");
+        printf("Suhu Anda: %d derajat Celcius\n", suhu);
+    }
+    
+    printf("Program selesai.\n");
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/cek\_tombol\_a.c} --- Cek satu karakter dengan \texttt{if} (konversi Pascal)}]{../contoh_code/c/cek_tombol_a.c}
+
+% ============================================================
+\section{Pernyataan \texttt{if-else}}
+% ============================================================
+
+Pernyataan \texttt{if-else} menyediakan dua jalur alternatif: satu jalur jika kondisi benar, dan jalur lain jika kondisi salah. Ini memastikan bahwa tepat satu dari dua blok kode akan dieksekusi.
+
+\begin{lstlisting}[language=C,caption=Pernyataan \texttt{if-else}]
+#include <stdio.h>
+
+int main(void) {
+    int skor;
+    printf("Masukkan skor: ");
+    scanf("%d", &skor);
+    
+    if (skor >= 60) {
+        printf("Status: LULUS (skor %d)\n", skor);
+    } else {
+        printf("Status: TIDAK LULUS (skor %d)\n", skor);
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/cek\_huruf\_besar.c} --- Cek rentang karakter huruf besar (konversi Pascal)}]{../contoh_code/c/cek_huruf_besar.c}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/tunjangan\_anak.c} --- \texttt{if} satu kondisi, perhitungan tunjangan (konversi Pascal)}]{../contoh_code/c/tunjangan_anak.c}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/tunjangan\_dan\_potongan.c} --- \texttt{if-else} dua variabel, tunjangan dan potongan (konversi Pascal)}]{../contoh_code/c/tunjangan_dan_potongan.c}
+
+% ============================================================
+\section{Pernyataan \texttt{else if} (Ladder)}
+% ============================================================
+
+Ketika terdapat lebih dari dua kemungkinan, kita dapat menyusun \texttt{else if} secara bertingkat (\textit{ladder}). Kondisi diperiksa dari atas ke bawah; begitu satu kondisi terpenuhi, bloknya dieksekusi dan sisanya dilewati. Blok \texttt{else} di akhir bersifat opsional dan berfungsi sebagai ``penangkap'' kasus yang tidak cocok dengan kondisi mana pun.
+
+\begin{lstlisting}[language=C,caption=Klasifikasi nilai dengan \texttt{else if}]
+#include <stdio.h>
+
+int main(void) {
+    int skor;
+    printf("Masukkan skor (0-100): ");
+    scanf("%d", &skor);
+    
+    char grade;
+    if (skor >= 85) {
+        grade = 'A';
+    } else if (skor >= 70) {
+        grade = 'B';
+    } else if (skor >= 60) {
+        grade = 'C';
+    } else if (skor >= 50) {
+        grade = 'D';
+    } else {
+        grade = 'E';
+    }
+    
+    printf("Skor: %d -> Nilai: %c\n", skor, grade);
+    return 0;
+}
+\end{lstlisting}
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Skor} & \textbf{Nilai} \\
+\hline
+85 -- 100 & A \\
+\hline
+70 -- 84 & B \\
+\hline
+60 -- 69 & C \\
+\hline
+50 -- 59 & D \\
+\hline
+0 -- 49 & E \\
+\hline
+\end{tabular}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/huruf\_mutu.c} --- Klasifikasi huruf mutu dengan \texttt{else-if} ladder (konversi Pascal)}]{../contoh_code/c/huruf_mutu.c}
+
+% ============================================================
+\section{Percabangan Bersarang (\textit{Nested} \texttt{if})}
+% ============================================================
+
+Percabangan bersarang adalah \texttt{if} di dalam \texttt{if}. Teknik ini digunakan ketika keputusan bergantung pada beberapa tingkat kondisi. Meskipun valid dan kadang diperlukan, nested \texttt{if} yang terlalu dalam sebaiknya dihindari karena mengurangi keterbacaan --- pertimbangkan untuk memecahnya menjadi fungsi terpisah atau menggabungkan kondisi dengan operator logika.
+
+\begin{lstlisting}[language=C,caption=Nested \texttt{if} --- kelayakan kredit]
+#include <stdio.h>
+
+int main(void) {
+    int umur;
+    double gaji;
+    
+    printf("Umur: "); scanf("%d", &umur);
+    printf("Gaji: "); scanf("%lf", &gaji);
+    
+    if (umur >= 21) {
+        if (gaji >= 5000000.0) {
+            printf("Kredit: DISETUJUI\n");
+        } else {
+            printf("Kredit: DITOLAK (gaji kurang)\n");
+        }
+    } else {
+        printf("Kredit: DITOLAK (umur kurang)\n");
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+Nested \texttt{if} di atas bisa disederhanakan dengan operator \texttt{\&\&}:
+
+\texttt{if (umur >= 21 \&\& gaji >= 5000000.0)} --- namun versi bersarang memungkinkan pesan error yang lebih spesifik untuk setiap kondisi.
+\end{catatan}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/diskriminan\_kuadrat.c} --- Nested \texttt{if} untuk diskriminan persamaan kuadrat (konversi Pascal)}]{../contoh_code/c/diskriminan_kuadrat.c}
+
+% ============================================================
+\section{Pernyataan \texttt{switch-case}}
+% ============================================================
+
+Pernyataan \texttt{switch} mengevaluasi sebuah ekspresi dan membandingkan nilainya dengan daftar konstanta (\texttt{case}). Jika cocok, blok kode pada \texttt{case} tersebut dieksekusi. \texttt{switch} cocok digunakan ketika kita membandingkan satu variabel dengan beberapa nilai tetap (terutama \texttt{int} atau \texttt{char}), dan lebih terbaca daripada rangkaian \texttt{else if} yang panjang untuk kasus demikian.
+
+\textbf{Penting:} setiap \texttt{case} harus diakhiri dengan \texttt{break} untuk mencegah \textit{fall-through} (eksekusi berlanjut ke \texttt{case} berikutnya). \texttt{default} menangani nilai yang tidak cocok dengan \texttt{case} mana pun.
+
+\begin{lstlisting}[language=C,caption=Menu dengan \texttt{switch}]
+#include <stdio.h>
+
+int main(void) {
+    int pilihan;
+    
+    printf("=== MENU ===\n");
+    printf("1. Tambah Data\n");
+    printf("2. Hapus Data\n");
+    printf("3. Tampilkan Data\n");
+    printf("4. Keluar\n");
+    printf("Pilihan Anda: ");
+    scanf("%d", &pilihan);
+    
+    switch (pilihan) {
+        case 1:
+            printf("Menambah data...\n");
+            break;
+        case 2:
+            printf("Menghapus data...\n");
+            break;
+        case 3:
+            printf("Menampilkan data...\n");
+            break;
+        case 4:
+            printf("Keluar. Sampai jumpa!\n");
+            break;
+        default:
+            printf("Pilihan tidak valid!\n");
+            break;
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C,caption=\texttt{switch} dengan \texttt{char} --- kalkulator]
+#include <stdio.h>
+
+int main(void) {
+    char op;
+    printf("Masukkan operator (+, -, *, /): ");
+    scanf(" %c", &op);  // spasi sebelum %c: skip whitespace
+    
+    switch (op) {
+        case '+': printf("Anda memilih penjumlahan\n"); break;
+        case '-': printf("Anda memilih pengurangan\n"); break;
+        case '*': printf("Anda memilih perkalian\n");   break;
+        case '/': printf("Anda memilih pembagian\n");   break;
+        default:  printf("Operator tidak dikenal\n");   break;
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/menu\_geometri\_case.c} --- Menu pilihan dengan \texttt{switch} (konversi Pascal)}]{../contoh_code/c/menu_geometri_case.c}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/upah\_golongan.c} --- \texttt{switch} karakter golongan + kalkulasi upah (konversi Pascal)}]{../contoh_code/c/upah_golongan.c}
+
+% ============================================================
+\section{Perbandingan \texttt{if-else if} vs \texttt{switch}}
+% ============================================================
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{4.6cm}|>{\raggedright\arraybackslash}p{4.6cm}|}
+\hline
+\textbf{Aspek} & \texttt{\textbf{if-else if}} & \texttt{\textbf{switch}} \\
+\hline
+Jenis kondisi & Ekspresi boolean apa pun & Hanya perbandingan kesamaan (integer/char) \\
+\hline
+Rentang nilai & Bisa menggunakan $>, <, >=, <=$ & Harus nilai konstan per \texttt{case} \\
+\hline
+Keterbacaan & Baik untuk sedikit kondisi & Lebih terbaca untuk banyak pilihan tetap \\
+\hline
+\texttt{break} & Tidak diperlukan & Wajib (mencegah fall-through) \\
+\hline
+\texttt{float/double} & Didukung & Tidak didukung \\
+\hline
+\end{tabular}
+}
+
+\begin{konsep}
+\textbf{Kapan gunakan \texttt{switch}?} Ketika membandingkan satu variabel \texttt{int}/\texttt{char} dengan banyak nilai konstan (misalnya pilihan menu, kode hari, jenis operasi). Gunakan \texttt{if-else} untuk kondisi yang melibatkan rentang, ekspresi kompleks, atau tipe \texttt{float}/\texttt{double}.
+\end{konsep}
+
+% ============================================================
+\section{Operator Ternary Sebagai Percabangan Ringkas}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Operator ternary dalam konteks]
+#include <stdio.h>
+
+int main(void) {
+    int x = 15;
+    
+    // Menentukan ganjil/genap dengan ternary
+    printf("%d adalah bilangan %s\n",
+           x, (x % 2 == 0) ? "genap" : "ganjil");
+    
+    // Menentukan nilai absolut
+    int absolut = (x >= 0) ? x : -x;
+    printf("Nilai absolut: %d\n", absolut);
+    
+    // Menentukan minimum dari dua bilangan
+    int a = 10, b = 25;
+    int minimum = (a < b) ? a : b;
+    printf("Minimum(%d, %d) = %d\n", a, b, minimum);
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Studi Kasus: Kalkulator BMI}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Kalkulator Body Mass Index]
+#include <stdio.h>
+
+int main(void) {
+    double berat, tinggi, bmi;
+    
+    printf("Masukkan berat badan (kg): ");
+    if (scanf("%lf", &berat) != 1 || berat <= 0) {
+        printf("Input berat tidak valid.\n");
+        return 1;
+    }
+    
+    printf("Masukkan tinggi badan (m): ");
+    if (scanf("%lf", &tinggi) != 1 || tinggi <= 0) {
+        printf("Input tinggi tidak valid.\n");
+        return 1;
+    }
+    
+    bmi = berat / (tinggi * tinggi);
+    
+    printf("\nBMI Anda: %.1f -> Kategori: ", bmi);
+    
+    if (bmi < 18.5) {
+        printf("Kurus (Underweight)\n");
+    } else if (bmi < 25.0) {
+        printf("Normal\n");
+    } else if (bmi < 30.0) {
+        printf("Gemuk (Overweight)\n");
+    } else {
+        printf("Obesitas\n");
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Studi Kasus Tambahan: Akar Persamaan Kuadrat}
+% ============================================================
+
+Contoh berikut merupakan studi kasus percabangan berlapis (\texttt{if}/\texttt{else-if}/\texttt{else}) untuk menentukan jenis akar persamaan kuadrat $ax^2+bx+c=0$ berdasarkan diskriminan $D = b^2 - 4ac$ (konversi dari Pascal \texttt{akar\_persamaan\_kuadrat.pas}).
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/akar\_persamaan\_kuadrat.c} --- Mencari akar persamaan kuadrat (konversi Pascal)}]{../contoh_code/c/akar_persamaan_kuadrat.c}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item Petani Kode, percabangan. \url{https://petanikode.com/tutorial/c}
+  \item W3Schools C, \texttt{if}/\texttt{switch}. \url{https://www.w3schools.com/c/c_conditions.php}
+  \item Programiz, \textit{C if...else}. \url{https://www.programiz.com/c-programming/c-if-else-statement}
+  \item GeeksforGeeks, \textit{Decision Making in C}. \url{https://www.geeksforgeeks.org/decision-making-c-cpp/}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Program klasifikasi BMI (gunakan studi kasus di atas, modifikasi kategori sesuai standar WHO).
+  \item Program menu interaktif dengan \texttt{switch} yang menampilkan informasi berbeda berdasarkan pilihan.
+  \item Program yang menentukan apakah suatu tahun adalah tahun kabisat (gunakan kombinasi operator logika).
+\end{aktivitas}
+
+\begin{latihan}
+  \item Kapan \texttt{switch} lebih tepat daripada rantai \texttt{if}?
+  \item Apa yang terjadi jika \texttt{break} dihilangkan dari \texttt{case}? Jelaskan konsep \textit{fall-through}.
+  \item Mengapa ternary operator tidak boleh digunakan untuk logika yang kompleks?
+  \item Tulis kondisi yang mengecek apakah sebuah karakter adalah huruf vokal (gunakan \texttt{switch} atau \texttt{if}).
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M3:} dua soal percabangan dengan uji minimal tiga kasus per soal. Unggah kode \texttt{.c} dan screenshot output.
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya dapat menyusun \texttt{if-else if-else} untuk klasifikasi bertingkat
+  \item Saya dapat menyusun \texttt{if} bersarang yang terbaca baik
+  \item Saya memahami \texttt{break} pada \texttt{switch} dan risiko fall-through
+  \item Saya dapat memilih antara \texttt{if} dan \texttt{switch} berdasarkan kasus
+  \item Saya dapat menggunakan operator ternary untuk ekspresi sederhana
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas tiga mekanisme percabangan dalam C: \texttt{if-else} untuk kondisi umum, \texttt{switch-case} untuk pilihan tetap berbasis integer/char, dan operator ternary untuk ekspresi ringkas. Percabangan bersarang memungkinkan logika multi-level, namun harus dijaga keterbacaannya.
+
+\textbf{Poin kunci:} kondisi dievaluasi sebagai bukan-nol (benar) atau nol (salah); \texttt{switch} wajib \texttt{break}; \texttt{if} lebih fleksibel untuk rentang dan ekspresi kompleks.
+
+\textbf{Kata kunci:} \texttt{if}, \texttt{else}, \texttt{switch}, \texttt{case}, \texttt{break}, \texttt{default}, ternary, nested
+\end{rangkuman}
+
+\end{document}

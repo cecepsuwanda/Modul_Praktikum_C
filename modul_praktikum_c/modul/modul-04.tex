@@ -1,0 +1,360 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{4}}{}
+\begin{document}
+
+\chapter{Struktur Perulangan}
+
+\begin{subcpmk}
+  \item Sub-CPMK 2.2: \texttt{for}, \texttt{while}, \texttt{do-while}, \texttt{break}/\texttt{continue}, perulangan bersarang sederhana
+\end{subcpmk}
+
+\SesiRPS{5}{2.2}{$\sim$170 menit}{CPMK-2}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+Sama bab sebelumnya.
+
+% ============================================================
+\section{Konsep Perulangan}
+% ============================================================
+
+Perulangan (\textit{loop}) memungkinkan sekumpulan instruksi dieksekusi berulang kali selama suatu kondisi terpenuhi. Tanpa loop, kita harus menyalin-tempel kode setiap kali ingin mengulang operasi --- tidak efisien dan rawan error. Perulangan adalah salah satu konsep paling fundamental dalam pemrograman: hampir semua program nyata menggunakan loop untuk memproses data, menunggu input, atau menjalankan algoritma.
+
+C menyediakan tiga struktur perulangan: \texttt{for} (ketika jumlah iterasi diketahui), \texttt{while} (ketika loop bergantung pada kondisi yang bisa berubah), dan \texttt{do-while} (ketika blok kode harus dieksekusi minimal satu kali). Ketiganya secara logika setara --- tetapi pemilihan yang tepat meningkatkan keterbacaan.
+
+% ============================================================
+\section{Perulangan \texttt{for}}
+% ============================================================
+
+Loop \texttt{for} terdiri dari tiga bagian dalam satu baris: inisialisasi, kondisi, dan update. Ini adalah pilihan terbaik ketika jumlah iterasi sudah diketahui sebelumnya.
+
+\begin{konsep}
+Sintaks: \texttt{for (inisialisasi; kondisi; update) \{ ... \}}
+\begin{enumerate}[nosep]
+  \item \textbf{Inisialisasi:} dijalankan sekali sebelum loop dimulai
+  \item \textbf{Kondisi:} diperiksa sebelum setiap iterasi; jika salah, loop berhenti
+  \item \textbf{Update:} dijalankan setelah setiap iterasi
+\end{enumerate}
+\end{konsep}
+
+\begin{lstlisting}[language=C,caption=Mencetak bilangan 1 sampai 10]
+#include <stdio.h>
+
+int main(void) {
+    for (int i = 1; i <= 10; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");  // Output: 1 2 3 4 5 6 7 8 9 10
+    return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C,caption=Variasi loop \texttt{for}]
+#include <stdio.h>
+
+int main(void) {
+    // Hitung mundur
+    for (int i = 5; i >= 1; i--) {
+        printf("%d ", i);
+    }
+    printf("\n");  // Output: 5 4 3 2 1
+    
+    // Lompat dua-dua
+    for (int i = 0; i <= 20; i += 2) {
+        printf("%d ", i);
+    }
+    printf("\n");  // Output: 0 2 4 6 8 10 12 14 16 18 20
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/hitung\_mundur.c} --- \texttt{for} hitung mundur dari $N$ ke 0 (konversi Pascal)}]{../contoh_code/c/hitung_mundur.c}
+
+% ============================================================
+\section{Perulangan \texttt{while}}
+% ============================================================
+
+Loop \texttt{while} memeriksa kondisi \textbf{sebelum} setiap iterasi. Jika kondisi awal sudah salah, blok kode tidak pernah dieksekusi. Loop ini cocok ketika jumlah iterasi tidak diketahui dan bergantung pada suatu kondisi dinamis, misalnya membaca input sampai pengguna mengetik perintah keluar.
+
+\begin{lstlisting}[language=C,caption=Loop \texttt{while} --- validasi input]
+#include <stdio.h>
+
+int main(void) {
+    int angka;
+    
+    printf("Masukkan bilangan positif: ");
+    scanf("%d", &angka);
+    
+    while (angka <= 0) {
+        printf("Invalid! Masukkan bilangan positif: ");
+        scanf("%d", &angka);
+    }
+    
+    printf("Anda memasukkan: %d\n", angka);
+    return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C,caption=Menghitung jumlah digit]
+#include <stdio.h>
+
+int main(void) {
+    int n, jumlah_digit = 0;
+    printf("Masukkan bilangan: ");
+    scanf("%d", &n);
+    
+    int temp = (n < 0) ? -n : n;  // nilai absolut
+    
+    if (temp == 0) {
+        jumlah_digit = 1;
+    } else {
+        while (temp > 0) {
+            jumlah_digit++;
+            temp /= 10;   // buang digit terakhir
+        }
+    }
+    
+    printf("Jumlah digit: %d\n", jumlah_digit);
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/balik\_bilangan.c} --- \texttt{while} membalik digit bilangan (konversi Pascal)}]{../contoh_code/c/balik_bilangan.c}
+
+% ============================================================
+\section{Perulangan \texttt{do-while}}
+% ============================================================
+
+Loop \texttt{do-while} memeriksa kondisi \textbf{setelah} blok kode dieksekusi, sehingga blok kode pasti dieksekusi \textbf{minimal satu kali}. Ini sangat berguna untuk menu interaktif (tampilkan menu dulu, baru cek apakah pengguna ingin lanjut) dan validasi input.
+
+\begin{lstlisting}[language=C,caption=Menu interaktif dengan \texttt{do-while}]
+#include <stdio.h>
+
+int main(void) {
+    int pilihan;
+    
+    do {
+        printf("\n=== MENU ===\n");
+        printf("1. Hitung Luas Persegi\n");
+        printf("2. Hitung Luas Lingkaran\n");
+        printf("0. Keluar\n");
+        printf("Pilihan: ");
+        scanf("%d", &pilihan);
+        
+        switch (pilihan) {
+            case 1: {
+                double sisi;
+                printf("Sisi: "); scanf("%lf", &sisi);
+                printf("Luas = %.2f\n", sisi * sisi);
+                break;
+            }
+            case 2: {
+                double r;
+                printf("Jari-jari: "); scanf("%lf", &r);
+                printf("Luas = %.2f\n", 3.14159 * r * r);
+                break;
+            }
+            case 0:
+                printf("Sampai jumpa!\n");
+                break;
+            default:
+                printf("Pilihan tidak valid.\n");
+        }
+    } while (pilihan != 0);
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/menu\_geometri\_repeat.c} --- \texttt{do-while} menu geometri berulang (konversi Pascal)}]{../contoh_code/c/menu_geometri_repeat.c}
+
+% ============================================================
+\section{Perbandingan Tiga Jenis Loop}
+% ============================================================
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{3.2cm}|}
+\hline
+\textbf{Aspek} & \texttt{\textbf{for}} & \texttt{\textbf{while}} & \texttt{\textbf{do-while}} \\
+\hline
+Pengecekan kondisi & Sebelum iterasi & Sebelum iterasi & \textbf{Setelah} iterasi \\
+\hline
+Eksekusi minimum & 0 kali & 0 kali & \textbf{1 kali} \\
+\hline
+Kapan digunakan & Jumlah iterasi \textbf{diketahui} & Iterasi bergantung \textbf{kondisi} & Harus jalan \textbf{minimal 1 kali} \\
+\hline
+Contoh kasus & Iterasi array, hitungan tetap & Baca file, cari data & Menu, validasi input \\
+\hline
+\end{tabular}
+}
+
+% ============================================================
+\section{Kendali Loop: \texttt{break} dan \texttt{continue}}
+% ============================================================
+
+Kata kunci \texttt{break} menghentikan loop sepenuhnya dan melanjutkan eksekusi ke pernyataan setelah loop. Kata kunci \texttt{continue} melewati sisa iterasi saat ini dan langsung melompat ke pengecekan kondisi (atau update pada \texttt{for}) untuk iterasi berikutnya. Keduanya harus digunakan dengan bijak --- terlalu banyak \texttt{break}/\texttt{continue} dapat membuat alur program sulit diikuti.
+
+\begin{lstlisting}[language=C,caption=\texttt{break} dan \texttt{continue}]
+#include <stdio.h>
+
+int main(void) {
+    // break: cari bilangan pertama habis dibagi 7
+    for (int i = 1; i <= 100; i++) {
+        if (i % 7 == 0) {
+            printf("Bilangan pertama habis dibagi 7: %d\n", i);
+            break;  // keluar dari loop
+        }
+    }
+    
+    // continue: cetak hanya bilangan ganjil 1-20
+    printf("Bilangan ganjil: ");
+    for (int i = 1; i <= 20; i++) {
+        if (i % 2 == 0) {
+            continue;  // lewati bilangan genap
+        }
+        printf("%d ", i);
+    }
+    printf("\n");
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Perulangan Bersarang (\textit{Nested Loop})}
+% ============================================================
+
+Perulangan bersarang adalah loop di dalam loop. Loop luar mengontrol ``baris'' dan loop dalam mengontrol ``kolom''. Ini sering digunakan untuk memproses data dua dimensi (matriks), mencetak pola, atau mengimplementasikan algoritma seperti \textit{bubble sort}.
+
+\begin{lstlisting}[language=C,caption=Tabel perkalian $5 \times 5$]
+#include <stdio.h>
+
+int main(void) {
+    printf("    ");
+    for (int j = 1; j <= 5; j++)
+        printf("%4d", j);
+    printf("\n    --------------------\n");
+    
+    for (int i = 1; i <= 5; i++) {
+        printf("%2d |", i);
+        for (int j = 1; j <= 5; j++) {
+            printf("%4d", i * j);
+        }
+        printf("\n");
+    }
+    return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C,caption=Pola segitiga bintang]
+#include <stdio.h>
+
+int main(void) {
+    int n = 5;
+    
+    // Segitiga rata kiri
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= i; j++) {
+            printf("* ");
+        }
+        printf("\n");
+    }
+    
+    /* Output:
+     * 
+     * * 
+     * * * 
+     * * * * 
+     * * * * * 
+     */
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/pola\_bintang.c} --- Nested \texttt{for}: pola bintang menurun (konversi Pascal)}]{../contoh_code/c/pola_bintang.c}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/tabel\_pangkat\_x.c} --- Nested \texttt{while}+\texttt{for}: tabel $x$, $1/x$, $x^2$, $x^3$ (konversi Pascal)}]{../contoh_code/c/tabel_pangkat_x.c}
+
+% ============================================================
+\section{Studi Kasus: Menghitung Faktorial}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Faktorial dengan validasi]
+#include <stdio.h>
+
+int main(void) {
+    int n;
+    printf("Masukkan n (0-12): ");
+    scanf("%d", &n);
+    
+    if (n < 0 || n > 12) {
+        printf("Error: n harus 0-12 (hindari overflow int)\n");
+        return 1;
+    }
+    
+    long long faktorial = 1;
+    for (int i = 2; i <= n; i++) {
+        faktorial *= i;
+    }
+    
+    printf("%d! = %lld\n", n, faktorial);
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+Mengapa batas $n \leq 12$? Karena $13! = 6{,}227{,}020{,}800$ melebihi kapasitas \texttt{int} (maks $\sim 2{,}1 \times 10^9$). Dengan \texttt{long long}, kita bisa hingga $20! = 2{,}4 \times 10^{18}$.
+\end{catatan}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/pangkat\_for.c} --- Menghitung $x^n$ menggunakan \texttt{for} (konversi Pascal)}]{../contoh_code/c/pangkat_for.c}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/rata\_rata\_data.c} --- Akumulasi dan rata-rata data dalam loop (konversi Pascal)}]{../contoh_code/c/rata_rata_data.c}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item GeeksforGeeks, loops in C. \url{https://www.geeksforgeeks.org/loops-in-c/}
+  \item Learn-C.org, \textit{Loops}. \url{https://www.learn-c.org/}
+  \item Programiz, \textit{C for loop}. \url{https://www.programiz.com/c-programming/c-for-loop}
+  \item W3Schools, \textit{C Loops}. \url{https://www.w3schools.com/c/c_for_loop.php}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Hitung faktorial $n$ dengan validasi $0 \leq n \leq 12$ (hindari overflow).
+  \item Buat pola segitiga bintang terbalik (dari $n$ bintang ke 1 bintang).
+  \item Buat program tabel perkalian $n \times n$ (input dari pengguna).
+  \item Buat program yang membaca bilangan terus-menerus sampai pengguna memasukkan 0, lalu tampilkan jumlah, rata-rata, dan nilai terbesar.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Bedakan \texttt{while} dan \texttt{do-while} dengan contoh konkret.
+  \item Apa yang terjadi jika \texttt{update} pada \texttt{for} dihilangkan? Bagaimana mencegah infinite loop?
+  \item Jelaskan perbedaan \texttt{break} dan \texttt{continue} dengan diagram alur.
+  \item Mengapa \texttt{goto} jarang digunakan dalam pemrograman modern?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M4:} dua latihan perulangan (satu menggunakan nested loop, satu menggunakan \texttt{break}/\texttt{continue}) + log mini hasil uji (minimal 3 kasus per soal).
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya dapat memilih struktur perulangan yang tepat (\texttt{for}/\texttt{while}/\texttt{do-while})
+  \item Saya dapat menggunakan nested loop untuk pola atau tabel
+  \item Saya memahami fungsi \texttt{break} dan \texttt{continue}
+  \item Saya menghindari perulangan tak hingga tak sengaja
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas tiga struktur perulangan C: \texttt{for} (iterasi dengan counter), \texttt{while} (loop kondisional), dan \texttt{do-while} (minimal satu eksekusi). Juga dibahas kendali loop (\texttt{break}/\texttt{continue}) dan nested loop untuk permasalahan dua dimensi.
+
+\textbf{Poin kunci:} inisialisasi, kondisi, update pada \texttt{for}; \texttt{do-while} untuk menu/validasi; nested loop untuk pola 2D; hati-hati infinite loop.
+
+\textbf{Kata kunci:} \texttt{for}, \texttt{while}, \texttt{do-while}, \texttt{break}, \texttt{continue}, nested loop, iterasi
+\end{rangkuman}
+
+\end{document}

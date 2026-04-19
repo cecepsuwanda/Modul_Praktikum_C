@@ -1,0 +1,304 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{10}}{}
+\begin{document}
+
+\chapter{Struktur Data Bentukan: \texttt{struct}, \texttt{union}, \texttt{enum}, dan \texttt{typedef}}
+
+\begin{subcpmk}
+  \item Sub-CPMK 5.3: \texttt{struct} --- definisi, akses anggota, nested struct, array of struct, pointer ke struct (\texttt{->}), \texttt{typedef}
+  \item Sub-CPMK 5.4: \texttt{union}, \texttt{enum}, bit fields (pengenalan)
+\end{subcpmk}
+
+\SesiRPS{11}{5.3--5.4}{$\sim$170 menit}{CPMK-5}
+
+% ============================================================
+\section{Mengapa Tipe Data Bentukan?}
+% ============================================================
+
+Tipe data dasar (\texttt{int}, \texttt{double}, \texttt{char}) menyimpan satu nilai. Namun data di dunia nyata sering kali terdiri dari beberapa informasi terkait --- misalnya data mahasiswa memiliki NIM (string), nama (string), dan IPK (double). \texttt{struct} memungkinkan kita mengelompokkan data-data terkait menjadi satu \textbf{tipe data baru}, sehingga kode lebih terorganisir, terbaca, dan mudah dikelola dibandingkan menggunakan banyak variabel terpisah.
+
+Selain \texttt{struct}, C juga menyediakan \texttt{union} (menyimpan satu dari beberapa tipe di lokasi memori yang sama), \texttt{enum} (mendefinisikan sekumpulan konstanta bernama), dan \texttt{typedef} (membuat alias untuk tipe data). Konsep-konsep ini merupakan fondasi untuk membangun abstraksi data yang lebih kompleks.
+
+% ============================================================
+\section{Mendefinisikan dan Menggunakan \texttt{struct}}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Definisi dan penggunaan \texttt{struct}]
+#include <stdio.h>
+#include <string.h>
+
+// Definisi struct
+struct Mahasiswa {
+    char nim[16];
+    char nama[50];
+    double ipk;
+    int semester;
+};
+
+int main(void) {
+    // Deklarasi dan inisialisasi
+    struct Mahasiswa mhs1 = {"12345678", "Budi Santoso", 3.75, 4};
+    
+    // Akses anggota dengan operator titik (.)
+    printf("NIM    : %s\n", mhs1.nim);
+    printf("Nama   : %s\n", mhs1.nama);
+    printf("IPK    : %.2f\n", mhs1.ipk);
+    printf("Semester: %d\n", mhs1.semester);
+    
+    // Mengubah nilai anggota
+    mhs1.ipk = 3.80;
+    mhs1.semester = 5;
+    
+    return 0;
+}
+\end{lstlisting}
+
+Berikut adalah contoh penggunaan \texttt{struct} yang langsung memproses data pegawai (nama, golongan, jumlah anak, upah) --- konversi dari Pascal \texttt{record\_upah.pas}.
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/record\_upah.c} --- \texttt{struct} pegawai langsung tanpa fungsi (konversi Pascal)}]{../contoh_code/c/record_upah.c}
+
+% ============================================================
+\section{\texttt{typedef} untuk Menyederhanakan Nama Tipe}
+% ============================================================
+
+Menulis \texttt{struct Mahasiswa} berulang kali cukup panjang. \texttt{typedef} membuat alias sehingga kita bisa menulis nama tipe yang lebih singkat. Ini adalah konvensi yang sangat umum di C --- hampir semua proyek C profesional menggunakan \texttt{typedef} untuk struct.
+
+\begin{lstlisting}[language=C,caption=\texttt{typedef} untuk struct]
+#include <stdio.h>
+
+typedef struct {
+    char nim[16];
+    char nama[50];
+    double ipk;
+} Mahasiswa;  // sekarang bisa langsung tulis Mahasiswa
+
+int main(void) {
+    Mahasiswa m = {"12345678", "Siti Aminah", 3.45};
+    printf("%s - %s - IPK: %.2f\n", m.nim, m.nama, m.ipk);
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Array of Struct}
+% ============================================================
+
+Menggabungkan array dan struct memungkinkan kita menyimpan kumpulan data terstruktur, seperti daftar mahasiswa, inventory barang, atau database sederhana.
+
+\begin{lstlisting}[language=C,caption=Array of struct --- daftar mahasiswa]
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char nim[16];
+    char nama[50];
+    double ipk;
+} Mahasiswa;
+
+void cetak_daftar(const Mahasiswa daftar[], int n) {
+    printf("%-12s %-20s %s\n", "NIM", "Nama", "IPK");
+    printf("--------------------------------------\n");
+    for (int i = 0; i < n; i++) {
+        printf("%-12s %-20s %.2f\n",
+               daftar[i].nim, daftar[i].nama, daftar[i].ipk);
+    }
+}
+
+int main(void) {
+    Mahasiswa daftar[] = {
+        {"11111111", "Andi", 3.50},
+        {"22222222", "Budi", 3.75},
+        {"33333333", "Cici", 3.90},
+    };
+    int n = sizeof(daftar) / sizeof(daftar[0]);
+    
+    cetak_daftar(daftar, n);
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/daf\_pegawai\_array.c} --- Array of struct pegawai dengan fungsi input/output (konversi Pascal)}]{../contoh_code/c/daf_pegawai_array.c}
+
+% ============================================================
+\section{Pointer ke Struct dan Operator \texttt{->}}
+% ============================================================
+
+Ketika kita memiliki pointer ke struct, kita menggunakan operator \textbf{arrow} (\texttt{->}) untuk mengakses anggotanya. \texttt{p->nama} setara dengan \texttt{(*p).nama} tetapi lebih terbaca. Pointer ke struct sangat penting untuk fungsi yang harus mengubah data struct dan untuk struktur data dinamis (linked list, di Bab selanjutnya).
+
+\begin{lstlisting}[language=C,caption=Pointer ke struct dan operator \texttt{->}]
+#include <stdio.h>
+
+typedef struct {
+    char nama[50];
+    int umur;
+} Orang;
+
+void ulang_tahun(Orang *p) {
+    p->umur++;  // setara dengan (*p).umur++
+    printf("%s sekarang berumur %d tahun\n", p->nama, p->umur);
+}
+
+int main(void) {
+    Orang andi = {"Andi", 20};
+    
+    printf("Sebelum: %s, %d tahun\n", andi.nama, andi.umur);
+    ulang_tahun(&andi);  // kirim alamat struct
+    printf("Sesudah: %s, %d tahun\n", andi.nama, andi.umur);
+    
+    return 0;
+}
+\end{lstlisting}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/record\_prosedur.c} --- \texttt{struct} pegawai dengan fungsi \texttt{input} dan \texttt{cetak} (konversi Pascal)}]{../contoh_code/c/record_prosedur.c}
+
+% ============================================================
+\section{Nested Struct}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Struct di dalam struct]
+#include <stdio.h>
+
+typedef struct {
+    int hari, bulan, tahun;
+} Tanggal;
+
+typedef struct {
+    char nama[50];
+    Tanggal tgl_lahir;  // struct di dalam struct
+} Pegawai;
+
+int main(void) {
+    Pegawai p = {"Dewi", {15, 8, 1995}};
+    
+    printf("Nama: %s\n", p.nama);
+    printf("Lahir: %02d/%02d/%d\n",
+           p.tgl_lahir.hari, p.tgl_lahir.bulan, p.tgl_lahir.tahun);
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{\texttt{union}}
+% ============================================================
+
+\texttt{union} mirip \texttt{struct}, tetapi semua anggotanya \textbf{berbagi lokasi memori yang sama}. Ukuran union adalah ukuran anggota terbesar. Hanya satu anggota yang ``aktif'' pada satu waktu --- menulis ke satu anggota menimpa yang lain. Union berguna untuk menghemat memori ketika hanya satu dari beberapa tipe data yang akan digunakan.
+
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Aspek} & \texttt{\textbf{struct}} & \texttt{\textbf{union}} \\
+\hline
+Memori & Alokasi untuk \textbf{semua} anggota & Alokasi untuk anggota \textbf{terbesar} saja \\
+\hline
+Akses & Semua anggota bisa diakses bersamaan & Hanya 1 anggota yang valid \\
+\hline
+Ukuran & Jumlah semua anggota + padding & Ukuran anggota terbesar \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Penggunaan \texttt{union}]
+#include <stdio.h>
+
+typedef union {
+    int bilangan;
+    double desimal;
+    char karakter;
+} Nilai;
+
+int main(void) {
+    Nilai v;
+    
+    v.bilangan = 42;
+    printf("int: %d\n", v.bilangan);
+    
+    v.desimal = 3.14;  // menimpa v.bilangan
+    printf("double: %.2f\n", v.desimal);
+    // printf("int sekarang: %d\n", v.bilangan);  // nilai tidak valid!
+    
+    printf("sizeof(Nilai) = %zu\n", sizeof(Nilai));  // = sizeof(double)
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{\texttt{enum} (Enumerasi)}
+% ============================================================
+
+\texttt{enum} mendefinisikan sekumpulan \textbf{konstanta bernama} (enumerator) yang secara default bernilai integer berurutan mulai dari 0. Enum meningkatkan keterbacaan kode karena mengganti ``angka ajaib'' (\textit{magic numbers}) dengan nama yang bermakna.
+
+\begin{lstlisting}[language=C,caption=Penggunaan \texttt{enum}]
+#include <stdio.h>
+
+typedef enum {
+    SENIN = 1,     // mulai dari 1 (bukan default 0)
+    SELASA,        // otomatis 2
+    RABU,          // 3
+    KAMIS,         // 4
+    JUMAT,         // 5
+    SABTU,         // 6
+    MINGGU         // 7
+} Hari;
+
+const char *nama_hari(Hari h) {
+    const char *nama[] = {"", "Senin", "Selasa", "Rabu",
+                          "Kamis", "Jumat", "Sabtu", "Minggu"};
+    return nama[h];
+}
+
+int main(void) {
+    Hari hari_ini = RABU;
+    printf("Hari ini: %s (nilai enum: %d)\n",
+           nama_hari(hari_ini), hari_ini);
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item cppreference, \texttt{struct}. \url{https://en.cppreference.com/w/c/language/struct}
+  \item Petani Kode, struct. \url{https://petanikode.com/tutorial/c}
+  \item Programiz, \textit{C struct}. \url{https://www.programiz.com/c-programming/c-structures}
+  \item Beej's Guide, \textit{Structs}. \url{https://beej.us/guide/bgc/html/index.html}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Buat struct \texttt{Buku} (judul, penulis, tahun, harga) dan cetak datanya.
+  \item Buat array of struct untuk menyimpan 5 buku, lalu cari buku dengan harga tertinggi.
+  \item Buat fungsi yang menerima pointer ke struct dan mengubah datanya.
+  \item Perhatikan kerangka latihan berikut yang merupakan konversi dari Pascal \texttt{prosedur\_upah\_latihan.pas} --- lengkapi definisi fungsi \texttt{input} dan \texttt{cetak} yang masih kosong:
+\end{aktivitas}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/prosedur\_upah\_latihan.c} --- Latihan: fungsi upah dengan struct (kerangka konversi Pascal)}]{../contoh_code/c/prosedur_upah_latihan.c}
+
+\begin{latihan}
+  \item Apa perbedaan \texttt{m.nama} dan \texttt{p->nama}? Kapan masing-masing digunakan?
+  \item Mengapa \texttt{union} menghemat memori dibanding \texttt{struct}?
+  \item Kapan \texttt{enum} lebih baik daripada \texttt{\#define}?
+  \item Apa fungsi \texttt{typedef} dan mengapa ia umum dipakai dengan \texttt{struct}?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M9:} daftar statis \texttt{struct} (min.\ 5 rekaman) dengan pencarian berdasarkan NIM atau nama, dan tampilan terformat.
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya dapat mendefinisikan dan menggunakan \texttt{struct}
+  \item Saya memahami operator \texttt{.} dan \texttt{->}
+  \item Saya dapat menggunakan array of struct
+  \item Saya memahami perbedaan \texttt{struct} dan \texttt{union}
+  \item Saya dapat menggunakan \texttt{enum} dan \texttt{typedef}
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas tipe data bentukan: \texttt{struct} (mengelompokkan data terkait), \texttt{typedef} (alias tipe), array of struct, pointer ke struct (operator \texttt{->}), nested struct, \texttt{union} (anggota berbagi memori), dan \texttt{enum} (konstanta bernama).
+
+\textbf{Poin kunci:} \texttt{typedef} menyederhanakan nama tipe; \texttt{p->anggota} untuk pointer ke struct; \texttt{union} hanya satu anggota aktif; \texttt{enum} mengganti magic numbers.
+
+\textbf{Kata kunci:} \texttt{struct}, \texttt{typedef}, \texttt{union}, \texttt{enum}, operator titik, operator arrow, nested struct
+\end{rangkuman}
+
+\end{document}

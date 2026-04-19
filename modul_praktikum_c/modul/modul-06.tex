@@ -1,0 +1,210 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{6}}{}
+\begin{document}
+
+\chapter{Organisasi Multi-berkas: \texttt{.c}, \texttt{.h}, dan Include Guards}
+
+\begin{subcpmk}
+  \item Sub-CPMK 3.2: Pemisahan \texttt{.c}/\texttt{.h}, \textit{include guards}, kompilasi multi-unit, \texttt{extern}
+\end{subcpmk}
+
+\SesiRPS{7}{3.2}{$\sim$170 menit}{CPMK-3}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+\texttt{gcc} dengan beberapa berkas sumber; editor yang mendukung banyak tab/panel.
+
+% ============================================================
+\section{Mengapa Multi-berkas?}
+% ============================================================
+
+Seiring pertumbuhan program, menyimpan semua kode dalam satu file \texttt{.c} menjadi tidak praktis. Program ribuan baris dalam satu file sulit dinavigasi, sulit dikelola oleh tim, dan memperlambat kompilasi karena setiap perubahan kecil mengharuskan seluruh file diproses ulang. Organisasi multi-berkas memisahkan \textbf{antarmuka} (deklarasi di \texttt{.h}) dari \textbf{implementasi} (definisi di \texttt{.c}), mirip daftar isi buku versus isi babnya.
+
+Konsep ini merupakan fondasi pemrograman modular dalam C. Setiap ``modul'' terdiri dari sepasang file: header (\texttt{.h}) yang berisi prototipe fungsi dan deklarasi tipe, serta implementasi (\texttt{.c}) yang berisi kode fungsi. File \texttt{main.c} menjadi titik masuk program yang menggunakan modul-modul tersebut melalui \texttt{\#include}.
+
+% ============================================================
+\section{Deklarasi vs Definisi}
+% ============================================================
+
+{\small
+\begin{tabularx}{\textwidth}{@{}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{5.8cm}|>{\raggedright\arraybackslash}X|@{}}
+\hline
+\textbf{Aspek} & \textbf{Deklarasi} & \textbf{Definisi} \\
+\hline
+Apa itu? & Memberitahu kompilator bahwa sesuatu \textit{ada} & Membuat sesuatu \textit{benar-benar ada} (alokasi memori / kode) \\
+\hline
+Di mana? & Header (\texttt{.h}) & Implementasi (\texttt{.c}) \\
+\hline
+Contoh fungsi & \texttt{int tambah(int, int);} & \texttt{int tambah(int a, int b)} \newline \texttt{\{ return a+b; \}} \\
+\hline
+Contoh variabel & \texttt{extern int total;} & \texttt{int total = 0;} \\
+\hline
+Boleh diulang? & Ya (di tiap file yang include) & Tidak (hanya satu file) \\
+\end{tabularx}
+\par
+}
+
+Setelah memahami perbedaan deklarasi dan definisi, berikut studi kasus praktis yang membangun proyek multi-berkas sederhana.
+
+% ============================================================
+\section{Studi Kasus: Modul \texttt{mathutil}}
+% ============================================================
+
+\subsection{File \texttt{mathutil.h} --- Header (antarmuka)}
+
+\begin{lstlisting}[language=C,caption=\texttt{mathutil.h} dengan include guard]
+#ifndef MATHUTIL_H    // jika belum didefinisikan
+#define MATHUTIL_H    // tandai sudah didefinisikan
+
+// Prototipe fungsi (deklarasi)
+int tambah(int a, int b);
+int kurang(int a, int b);
+int kali(int a, int b);
+double bagi(int a, int b);
+
+// Konstanta
+#define PI 3.14159265
+
+#endif  // MATHUTIL_H
+\end{lstlisting}
+
+\subsection{File \texttt{mathutil.c} --- Implementasi}
+
+\begin{lstlisting}[language=C,caption=\texttt{mathutil.c} --- definisi fungsi]
+#include "mathutil.h"  // include header sendiri
+#include <stdio.h>
+
+int tambah(int a, int b) { return a + b; }
+int kurang(int a, int b) { return a - b; }
+int kali(int a, int b)   { return a * b; }
+
+double bagi(int a, int b) {
+    if (b == 0) {
+        printf("Error: pembagian oleh nol!\n");
+        return 0.0;
+    }
+    return (double)a / b;
+}
+\end{lstlisting}
+
+\subsection{File \texttt{main.c} --- Program utama}
+
+\begin{lstlisting}[language=C,caption=\texttt{main.c} menggunakan modul mathutil]
+#include <stdio.h>
+#include "mathutil.h"   // include header modul sendiri
+
+int main(void) {
+    int x = 10, y = 3;
+    
+    printf("%d + %d = %d\n", x, y, tambah(x, y));
+    printf("%d - %d = %d\n", x, y, kurang(x, y));
+    printf("%d * %d = %d\n", x, y, kali(x, y));
+    printf("%d / %d = %.2f\n", x, y, bagi(x, y));
+    printf("PI = %.5f\n", PI);
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Include Guards}
+% ============================================================
+
+Include guard mencegah isi header disertakan lebih dari sekali dalam unit kompilasi yang sama. Tanpa include guard, jika dua header saling meng-\texttt{include} atau \texttt{main.c} secara tidak langsung menyertakan header yang sama dua kali, kompilator akan menemukan deklarasi duplikat dan menghasilkan error.
+
+Ada dua cara menulis include guard:
+
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Metode} & \textbf{Tradisional (\texttt{\#ifndef})} & \textbf{Modern (\texttt{\#pragma once})} \\
+\hline
+Sintaks &
+\texttt{\#ifndef HEADER\_H} \newline
+\texttt{\#define HEADER\_H} \newline
+\texttt{...isi...} \newline
+\texttt{\#endif} &
+\texttt{\#pragma once} \newline
+\texttt{...isi...} \\
+\hline
+Portabilitas & Standar C (semua kompilator) & Didukung mayoritas kompilator (bukan standar resmi) \\
+\hline
+\end{tabular}
+
+% ============================================================
+\section{Kompilasi Multi-berkas}
+% ============================================================
+
+\begin{lstlisting}[language=bash,caption=Langkah kompilasi terpisah]
+# Langkah 1: kompilasi tiap .c menjadi .o (object file)
+gcc -Wall -Wextra -std=c17 -c mathutil.c -o mathutil.o
+gcc -Wall -Wextra -std=c17 -c main.c -o main.o
+
+# Langkah 2: tautkan (link) semua .o menjadi executable
+gcc mathutil.o main.o -o program
+
+# Atau satu baris (gcc langsung):
+gcc -Wall -Wextra -std=c17 -o program main.c mathutil.c
+\end{lstlisting}
+
+\begin{konsep}
+\textbf{Keuntungan kompilasi terpisah:} jika hanya \texttt{mathutil.c} yang diubah, cukup kompilasi ulang file itu saja, lalu tautkan dengan \texttt{main.o} yang sudah ada. Pada proyek besar, ini menghemat waktu kompilasi secara signifikan.
+\end{konsep}
+
+% ============================================================
+\section{Keyword \texttt{extern}}
+% ============================================================
+
+Kata kunci \texttt{extern} digunakan untuk mendeklarasikan bahwa sebuah variabel \textbf{didefinisikan di file lain}. Ini memungkinkan berbagi variabel global antar file --- namun praktik ini harus diminimalisir (lebih baik menggunakan parameter fungsi).
+
+\begin{lstlisting}[language=C,caption=Penggunaan \texttt{extern}]
+// config.c
+int jumlah_mahasiswa = 40;  // DEFINISI (alokasi memori)
+
+// main.c
+extern int jumlah_mahasiswa;  // DEKLARASI (referensi ke config.c)
+printf("Jumlah: %d\n", jumlah_mahasiswa);
+\end{lstlisting}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item GNU C Reference Manual, praprosesor. \url{https://www.gnu.org/software/gnu-c-manual/gnu-c-manual.html}
+  \item Beej's Guide, \textit{Multifile Projects}. \url{https://beej.us/guide/bgc/html/index.html}
+  \item cppreference, \textit{include}. \url{https://en.cppreference.com/w/c/preprocessor/include}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Bangun mini-proyek dua unit: utilitas (\texttt{.h} + \texttt{.c}) dan \texttt{main.c}.
+  \item Kompilasi secara terpisah (\texttt{-c} untuk setiap \texttt{.c}, lalu tautkan).
+  \item Coba hilangkan include guard dan \texttt{\#include} header dua kali --- amati error-nya.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Apa perbedaan \texttt{\#include <stdio.h>} dan \texttt{\#include "mathutil.h"}?
+  \item Mengapa definisi fungsi tidak boleh diletakkan di file header?
+  \item Jelaskan kegunaan \texttt{extern} dan risikonya.
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M5b:} struktur folder (minimal 3 file: header, implementasi, main), header aman dengan include guard, skrip kompilasi manual (perintah dalam \texttt{README}).
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya memahami perbedaan deklarasi di \texttt{.h} dan definisi di \texttt{.c}
+  \item Saya dapat menulis include guard yang benar
+  \item Saya dapat mengompilasi dan menautkan beberapa file \texttt{.c}
+  \item Saya memahami kapan menggunakan \texttt{extern}
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas organisasi program C menjadi beberapa file: header (\texttt{.h}) untuk deklarasi dan implementasi (\texttt{.c}) untuk definisi. Include guard mencegah penyertaan ganda. Kompilasi terpisah meningkatkan efisiensi pada proyek besar.
+
+\textbf{Poin kunci:} include guards (\texttt{\#ifndef}); model kompilasi terpisah lalu taut; \texttt{"..."} untuk header lokal, \texttt{<...>} untuk header sistem.
+
+\textbf{Kata kunci:} header, \texttt{.h}, \texttt{.c}, include guard, \texttt{extern}, kompilasi terpisah, linking
+\end{rangkuman}
+
+\end{document}

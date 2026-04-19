@@ -1,0 +1,301 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{5}}{}
+\begin{document}
+
+\chapter{Fungsi, Prototipe, Scope, dan Rekursi}
+
+\begin{subcpmk}
+  \item Sub-CPMK 3.1: Definisi fungsi, prototipe, parameter/nilai balik, scope variabel, storage classes, \texttt{static} pengenalan
+  \item Sub-CPMK 3.2: Rekursi dasar (faktorial, Fibonacci)
+\end{subcpmk}
+
+\SesiRPS{6}{3.1--3.2}{$\sim$170 menit}{CPMK-3}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+Sama bab sebelumnya.
+
+% ============================================================
+\section{Mengapa Fungsi?}
+% ============================================================
+
+Fungsi adalah blok kode yang dapat digunakan kembali (\textit{reusable}) dan menerima input (parameter) serta menghasilkan output (nilai balik). Fungsi memecah program besar menjadi bagian-bagian kecil yang lebih mudah dipahami, diuji, dan dipelihara --- prinsip ini disebut \textbf{pemrograman modular}. Tanpa fungsi, kode akan penuh dengan duplikasi dan sangat sulit untuk di-debug.
+
+Dalam C, setiap program wajib memiliki minimal satu fungsi: \texttt{main()}. Fungsi-fungsi lain yang kita buat sendiri disebut \textit{user-defined functions}, sedangkan fungsi dari pustaka standar (seperti \texttt{printf}, \texttt{scanf}, \texttt{strlen}) disebut \textit{library functions}. Kebiasaan memecah masalah menjadi fungsi-fungsi kecil adalah keterampilan penting yang akan sangat berguna di dunia profesional.
+
+% ============================================================
+\section{Deklarasi (Prototipe) dan Definisi Fungsi}
+% ============================================================
+
+\textbf{Prototipe} (atau deklarasi maju / \textit{forward declaration}) memberitahu kompilator tentang nama fungsi, tipe kembalian, dan parameter-parameternya \textbf{sebelum} fungsi tersebut dipanggil. Prototipe biasanya ditempatkan di atas \texttt{main()} atau dalam file header (\texttt{.h}). \textbf{Definisi} adalah implementasi lengkap dari fungsi, yaitu prototipe ditambah badan fungsi (\textit{function body}).
+
+\begin{lstlisting}[language=C,caption=Prototipe dan definisi fungsi]
+#include <stdio.h>
+
+// Prototipe (deklarasi maju)
+int tambah(int a, int b);
+double luas_persegi(double sisi);
+void tampilkan_garis(int panjang);
+
+int main(void) {
+    printf("3 + 5 = %d\n", tambah(3, 5));
+    printf("Luas = %.2f\n", luas_persegi(4.5));
+    tampilkan_garis(20);
+    return 0;
+}
+
+// Definisi fungsi
+int tambah(int a, int b) {
+    return a + b;
+}
+
+double luas_persegi(double sisi) {
+    return sisi * sisi;
+}
+
+void tampilkan_garis(int panjang) {
+    for (int i = 0; i < panjang; i++) {
+        printf("-");
+    }
+    printf("\n");
+    // fungsi void tidak perlu return (opsional: return;)
+}
+\end{lstlisting}
+
+\begin{tabular}{|>{\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{9.0cm}|}
+\hline
+\textbf{Komponen} & \textbf{Keterangan} \\
+\hline
+\texttt{int tambah(int a, int b)} & Mengembalikan \texttt{int}; menerima dua parameter \texttt{int} \\
+\hline
+\texttt{void tampilkan\_garis(int n)} & Tidak mengembalikan nilai (\texttt{void}); menerima satu parameter \\
+\hline
+\texttt{int main(void)} & Tidak menerima parameter (\texttt{void}); mengembalikan kode keluar \\
+\hline
+\end{tabular}
+
+% ============================================================
+\section{Parameter: Pass by Value}
+% ============================================================
+
+Dalam C, semua argumen fungsi dilewatkan secara \textbf{pass by value} --- artinya fungsi menerima \textbf{salinan} dari nilai argumen, bukan variabel aslinya. Perubahan terhadap parameter di dalam fungsi \textbf{tidak mempengaruhi} variabel di pemanggil. Untuk mengubah variabel asli, kita perlu menggunakan pointer (dibahas di Bab 9).
+
+\begin{lstlisting}[language=C,caption=Demonstrasi pass by value]
+#include <stdio.h>
+
+void coba_ubah(int x) {
+    x = 999;  // hanya mengubah salinan lokal
+    printf("Di dalam fungsi: x = %d\n", x);
+}
+
+int main(void) {
+    int nilai = 42;
+    
+    printf("Sebelum: nilai = %d\n", nilai);
+    coba_ubah(nilai);
+    printf("Sesudah: nilai = %d\n", nilai);  // tetap 42!
+    
+    return 0;
+}
+/* Output:
+   Sebelum: nilai = 42
+   Di dalam fungsi: x = 999
+   Sesudah: nilai = 42
+*/
+\end{lstlisting}
+
+% ============================================================
+\section{Scope (Ruang Lingkup) Variabel}
+% ============================================================
+
+\textit{Scope} menentukan di bagian mana kode sebuah variabel dapat diakses. C memiliki beberapa tingkatan scope: \textbf{block scope} (variabel lokal di dalam \texttt{\{\}}), \textbf{file scope} (variabel global yang dideklarasikan di luar semua fungsi), dan \textbf{function prototype scope} (parameter dalam prototipe). Variabel lokal hanya ada selama blok kodenya aktif; setelah blok selesai, memorinya dilepaskan.
+
+\begin{lstlisting}[language=C,caption=Demonstrasi scope variabel]
+#include <stdio.h>
+
+int global = 100;  // file scope: bisa diakses di mana saja
+
+void fungsi_a(void) {
+    int lokal = 10;  // block scope: hanya ada di fungsi_a
+    printf("fungsi_a: lokal=%d, global=%d\n", lokal, global);
+}
+
+int main(void) {
+    int x = 5;  // block scope: hanya ada di main
+    printf("main: x=%d, global=%d\n", x, global);
+    
+    {  // blok baru
+        int y = 20;  // hanya ada di blok ini
+        printf("blok: x=%d, y=%d\n", x, y);
+    }
+    // printf("%d", y);  // ERROR! y tidak ada di sini
+    
+    fungsi_a();
+    // printf("%d", lokal);  // ERROR! lokal tidak ada di sini
+    
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+\textbf{Hindari variabel global} kecuali benar-benar diperlukan. Variabel global membuat program sulit di-debug karena nilainya bisa diubah dari mana saja. Lebih baik gunakan parameter fungsi untuk mengalirkan data.
+\end{catatan}
+
+% ============================================================
+\section{Storage Classes}
+% ============================================================
+
+Storage class menentukan \textbf{masa hidup} (\textit{lifetime}) dan \textbf{linkage} (visibilitas antar-file) sebuah variabel. C menyediakan empat storage class:
+
+\begin{tabular}{|l|l|l|p{5.5cm}|}
+\hline
+\textbf{Storage Class} & \textbf{Lifetime} & \textbf{Scope} & \textbf{Keterangan} \\
+\hline
+\texttt{auto} & Blok & Lokal & Default untuk variabel lokal; jarang ditulis eksplisit \\
+\hline
+\texttt{static} (lokal) & Program & Lokal & Nilai dipertahankan antar pemanggilan fungsi \\
+\hline
+\texttt{static} (global) & Program & File & Hanya visible di file yang sama \\
+\hline
+\texttt{extern} & Program & Global & Mengakses variabel yang didefinisikan di file lain \\
+\hline
+\texttt{register} & Blok & Lokal & Saran ke kompilator: simpan di register (jarang dipakai) \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=\texttt{static} lokal --- counter yang bertahan]
+#include <stdio.h>
+
+void hitung_panggilan(void) {
+    static int counter = 0;  // hanya diinisialisasi SEKALI
+    counter++;
+    printf("Fungsi dipanggil %d kali\n", counter);
+}
+
+int main(void) {
+    hitung_panggilan();  // 1 kali
+    hitung_panggilan();  // 2 kali
+    hitung_panggilan();  // 3 kali
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Rekursi}
+% ============================================================
+
+Rekursi adalah teknik di mana sebuah fungsi memanggil dirinya sendiri. Setiap panggilan rekursif harus memiliki \textbf{base case} (kondisi berhenti) untuk mencegah rekursi tak terbatas yang menyebabkan \textit{stack overflow}. Rekursi sangat cocok untuk masalah yang secara alami bersifat rekursif, seperti pohon, deret matematika, dan algoritma divide-and-conquer.
+
+Setiap pemanggilan fungsi menggunakan \textit{stack frame} baru di memori stack. Jika rekursi terlalu dalam (misalnya tanpa base case atau dengan input sangat besar), stack akan penuh dan program crash. Oleh karena itu, selalu pastikan base case tercapai dan kedalaman rekursi terbatas.
+
+\begin{lstlisting}[language=C,caption=Faktorial rekursif]
+#include <stdio.h>
+
+long long faktorial(int n) {
+    if (n <= 1) return 1;        // base case
+    return n * faktorial(n - 1); // recursive case
+}
+
+int main(void) {
+    for (int i = 0; i <= 10; i++) {
+        printf("%2d! = %lld\n", i, faktorial(i));
+    }
+    return 0;
+}
+\end{lstlisting}
+
+Berikut adalah implementasi faktorial rekursif yang merupakan konversi dari kode Pascal \texttt{faktorial.pas}. Perhatikan bagaimana fungsi rekursif di C sangat mirip strukturnya dengan versi Pascal.
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/faktorial.c} --- Rekursi faktorial (konversi Pascal)}]{../contoh_code/c/faktorial.c}
+
+\begin{lstlisting}[language=C,caption=Fibonacci rekursif]
+#include <stdio.h>
+
+int fibonacci(int n) {
+    if (n <= 0) return 0;       // base case 1
+    if (n == 1) return 1;       // base case 2
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main(void) {
+    printf("Deret Fibonacci: ");
+    for (int i = 0; i < 15; i++) {
+        printf("%d ", fibonacci(i));
+    }
+    printf("\n");
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+Fibonacci rekursif di atas sangat \textbf{tidak efisien} (kompleksitas eksponensial $O(2^n)$) karena menghitung ulang nilai yang sama berkali-kali. Untuk praktik nyata, gunakan iterasi atau \textit{memoization}. Rekursi lebih cocok untuk masalah seperti traversal pohon dan divide-and-conquer (Modul 17).
+\end{catatan}
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{4.2cm}|}
+\hline
+\textbf{Aspek} & \textbf{Iterasi (loop)} & \textbf{Rekursi} \\
+\hline
+Mekanisme & Mengulang dengan loop & Fungsi memanggil dirinya \\
+\hline
+Memori & Konstan & Bertambah per panggilan (stack) \\
+\hline
+Risiko & Infinite loop & Stack overflow \\
+\hline
+Keterbacaan & Tergantung masalah & Lebih alami untuk masalah rekursif \\
+\hline
+Performa & Umumnya lebih cepat & Overhead pemanggilan fungsi \\
+\hline
+\end{tabular}
+}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item UNS EE0107-19 (PDF) sebagai acuan struktur prosedural. \url{https://elektro.ft.uns.ac.id/wp-content/uploads/2020/08/RPS_EE0107-19_Pemrograman-Dasar.pdf}
+  \item Beej's Guide to C, fungsi. \url{https://beej.us/guide/bgc/html/index.html}
+  \item Programiz, \textit{C Functions}. \url{https://www.programiz.com/c-programming/c-functions}
+  \item GeeksforGeeks, \textit{C Functions}. \url{https://www.geeksforgeeks.org/c-functions/}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Refaktor program Bab 4 menjadi minimal tiga fungsi.
+  \item Buat fungsi \texttt{int pangkat(int base, int exp)} menggunakan loop.
+  \item Buat fungsi rekursif untuk menghitung pangkat: $\mathrm{base}^{\mathrm{exp}}$.
+  \item Buat program dengan fungsi berkembalian \texttt{void} dan fungsi berkembalian \texttt{int}.
+  \item Perhatikan kerangka latihan fungsi pangkat berikut, yang merupakan konversi dari kode Pascal \texttt{pangkat\_latihan.pas} --- lengkapi bagian yang ditandai agar program dapat menghitung $\mathrm{base}^{\mathrm{exp}}$ dengan benar:
+\end{aktivitas}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/pangkat\_latihan.c} --- Latihan: fungsi \texttt{fpangkat} (kerangka konversi Pascal)}]{../contoh_code/c/pangkat_latihan.c}
+
+\begin{latihan}
+  \item Apa yang terjadi jika rekursi tidak memiliki base case?
+  \item Jelaskan perbedaan \texttt{static} lokal dan variabel lokal biasa.
+  \item Mengapa pass by value aman tetapi terbatas?
+  \item Tulis faktorial versi iteratif dan bandingkan dengan versi rekursif.
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M5a:} modul fungsi (minimal 3 fungsi terpisah) + dokumentasi singkat per fungsi (komentar: tujuan, parameter, return value).
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya dapat memisahkan tanggung jawab ke fungsi
+  \item Saya memahami prototipe, definisi, dan pemanggilan fungsi
+  \item Saya memahami pass by value dan keterbatasannya
+  \item Saya memahami scope lokal vs global
+  \item Saya dapat menulis fungsi rekursif dengan base case yang benar
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas fungsi sebagai dasar pemrograman modular: prototipe vs definisi, parameter dan nilai balik, pass by value, scope variabel (lokal/global), storage classes (\texttt{auto}, \texttt{static}, \texttt{extern}), serta rekursi dengan base case.
+
+\textbf{Poin kunci:} prototipe sebelum \texttt{main}; \texttt{static} mempertahankan nilai; pass by value = salinan; rekursi harus punya base case.
+
+\textbf{Kata kunci:} fungsi, prototipe, parameter, \texttt{return}, scope, \texttt{static}, rekursi, base case, stack frame
+\end{rangkuman}
+
+\end{document}

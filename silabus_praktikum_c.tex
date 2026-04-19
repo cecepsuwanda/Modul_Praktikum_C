@@ -1,0 +1,464 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[indonesian]{babel}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{pdflscape}
+\usepackage[hidelinks,breaklinks]{hyperref}
+\usepackage{xurl}
+\geometry{margin=2.5cm}
+
+\begin{document}
+
+\begin{center}
+\textbf{\Large RENCANA PEMBELAJARAN SEMESTER (RPS)}\\
+\textbf{Mata Kuliah Praktikum Pemrograman C}\\
+\textbf{Berbasis Outcome-Based Education (OBE)}\\[0.5cm]
+\textbf{PROGRAM STUDI TEKNIK INFORMATIKA (S1)}\\
+\textbf{FAKULTAS TEKNIK}\\
+\textbf{UNIVERSITAS LOREM IPSUM}\\
+\end{center}
+
+\vspace{0.75cm}
+
+% ============================================================
+% BAGIAN A — Identitas dan konteks mata kuliah praktikum
+% ============================================================
+\section*{Bagian A. Identitas dan Konteks Mata Kuliah Praktikum}
+
+\noindent\textbf{Catatan:} RPS ini selaras dengan kerangka dokumen institusi dan \texttt{struktur\_silabus\_OBE.text}. Prodi menyesuaikan kode MK, jumlah minggu efektif, slot jadwal, dan komponen penilaian dengan kalender akademik serta kebijakan mutu kampus. Acuan kurikulum praktikum prosedural berbahasa C mengacu pola RPS terbuka (UNESA, UNS) dan struktur OBE praktikum (UNWAHAS) pada \texttt{sumber\_materi.md}. Daftar lengkap 30 modul materi (dasar--lanjutan) beserta sumber referensi tersedia di \texttt{sumber\_materi.md}.
+
+\begin{tabular}{@{}p{5.2cm}p{9.5cm}@{}}
+Nama Program Studi & : Teknik Informatika (S1) \\
+Nama Mata Kuliah & : Praktikum Pemrograman C \\
+Kode Mata Kuliah & : TIF-1xx (sesuaikan kurikulum prodi) \\
+Semester / Tahun Akademik & : \ldots\ / \ldots \\
+Bobot SKS (total) & : 1 SKS (seluruhnya Praktikum) \\
+Rincian SKS (jika MK campuran) & : T = 0, P = 1 \\
+Dosen Pengampu & : \ldots \\
+Koordinator Praktikum (opsional) & : \ldots \\
+Kontak akademik & : \ldots \\
+Tim asisten laboratorium & : \ldots\ (jika ada) \\
+Prasyarat & : Algoritma dan Pemrograman / Pemrograman Dasar (sesuai kurikulum prodi) \\
+Ko-requisit & : \ldots\ (jika ada) \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\noindent\textbf{Deskripsi singkat mata kuliah.} Praktikum ini membekali mahasiswa keterampilan pemrograman prosedural dengan \textbf{bahasa C} sesuai standar akademik \textbf{C11/C17} (referensi implementasi \textbf{GCC/Clang}). Cakupan materi meliputi: alur kompilasi--penautan, variabel dan tipe data, operator dan ekspresi, \texttt{stdio} (I/O terformat), struktur kontrol (percabangan dan perulangan), fungsi dan rekursi, larik (satu dan dua dimensi), manipulasi string, pointer dan aritmetika pointer, \texttt{struct}/\texttt{union}/\texttt{enum}/\texttt{typedef}, manajemen memori dinamis (\texttt{malloc}, \texttt{calloc}, \texttt{realloc}, \texttt{free}), penanganan berkas teks dan biner, preprocessor dan makro, serta pengenalan struktur data dasar (linked list, stack, queue). Kegiatan berpusat pada laboratorium komputer; artefak berupa kode sumber, \texttt{Makefile}, log praktikum, dan laporan dinilai berbasis Sub-CPMK. Materi lanjutan (Modul 16--30 pada \texttt{sumber\_materi.md}: algoritma sorting/searching, rekursi lanjutan, bitwise, debugging/\texttt{gdb}, multi-file/\texttt{Makefile}, pustaka standar, function pointer, multithreading, network programming, fitur C11/C17/C23, secure coding) dapat digunakan untuk semester lanjutan atau pengayaan.
+
+\noindent\textbf{Alokasi waktu.} Acuan beban KPT untuk praktikum: $\pm$170 menit kegiatan terstruktur per minggu per SKS praktikum per semester. Untuk 1 SKS, prodi merencanakan satu blok $\pm$170 menit per minggu (atau pembagian slot setara) sesuai jadwal resmi.
+
+\noindent\textbf{Sarana dan prasarana.} Laboratorium dengan \textbf{GCC} atau \textbf{Clang}, \textbf{GNU Make}, \textbf{GDB}, \textbf{Valgrind} (opsional), editor/IDE (mis.\ VS Code, Neovim, Code::Blocks), terminal, kebijakan K3 listrik/perangkat, etika lisensi perangkat lunak, dan akses dokumentasi resmi (\texttt{cppreference}, manual GCC, Beej's Guide) sesuai kebijakan jaringan lab.
+
+\vspace{0.75cm}
+
+% ============================================================
+% BAGIAN B — Sembilan komponen minimal RPS (SN-Dikti)
+% ============================================================
+\section*{Bagian B. Sembilan Komponen Minimal RPS (Penjabaran untuk Praktikum)}
+
+Komponen berikut dipenuhi melalui narasi di bawah serta terjemahan operasional pada Bagian C, D, dan E.
+
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.}]
+  \item \textbf{Identitas mata kuliah} --- tercantum pada Bagian A dan kop dokumen.
+
+  \item \textbf{Capaian pembelajaran lulusan (CPL) yang dibebankan} --- rumusan CPL prodi yang menjadi beban MK ini diuraikan pada awal Bagian C (lihat matriks CPMK $\rightarrow$ CPL).
+
+  \item \textbf{Kemampuan akhir tiap tahap pembelajaran} --- dioperasionalkan sebagai Sub-CPMK per minggu pada tabel Bagian E dan daftar Sub-CPMK pada Bagian C.
+
+  \item \textbf{Bahan kajian} --- prosedur lab, konsep bahasa C (30 modul pada \texttt{sumber\_materi.md}), K3 dan etika (lisensi, keamanan data), standar gaya dan peringatan kompilator; rincian mingguan pada kolom ``Bahan kajian'' Bagian E.
+
+  \item \textbf{Metode pembelajaran} --- \textit{briefing}, demonstrasi, praktikum terbimbing, praktik mandiri/kelompok, konsultasi, pengecekan kinerja oleh dosen/asisten; tercantum per minggu di Bagian E.
+
+  \item \textbf{Waktu} --- alokasi menit/slot per sesi dan beban di luar tatap muka (persiapan, laporan) disesuaikan prodi; kolom ``Waktu'' pada Bagian E.
+
+  \item \textbf{Pengalaman belajar mahasiswa} --- LKS, berkas \texttt{.c}/\texttt{.h}, \textit{logbook}, unggah artefak/repositori, refleksi singkat; dijelaskan per minggu pada Bagian E.
+
+  \item \textbf{Penilaian} --- kriteria, indikator, bobot total 100\%, rubrik terhubung Sub-CPMK/CPMK; lihat Bagian D dan kolom ``Asesmen'' Bagian E.
+
+  \item \textbf{Daftar referensi} --- dokumentasi C/GCC, tutorial terbuka, buku klasik, dan RPS institusi acuan pada \texttt{sumber\_materi.md} (Bagian akhir dokumen).
+\end{enumerate}
+
+\vspace{0.75cm}
+
+% ============================================================
+% BAGIAN C — Blok OBE
+% ============================================================
+\section*{Bagian C. Capaian Pembelajaran, Sub-CPMK, Matriks, dan Strategi Analisis}
+
+\subsection*{C.1. Capaian pembelajaran lulusan (CPL) yang dibebankan}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{CPL-1 (Pengetahuan):} Menguasai konsep algoritme dan pemrograman prosedural dalam C, representasi data (tipe dasar, array, string, struct, union, enum), modularitas berkas sumber, manajemen memori (stack, heap, pointer, alokasi dinamis), serta prinsip penanganan berkas dan pustaka standar.
+  \item \textbf{CPL-2 (Keterampilan umum):} Menerapkan pemikiran logis, sistematis, dan kritis dalam merancang, mengimplementasikan, serta menguji program C untuk masalah komputasi dari sederhana hingga menengah, termasuk penggunaan struktur data dasar.
+  \item \textbf{CPL-3 (Keterampilan khusus):} Menulis, mengompilasi, menautkan, dan memperbaiki program C memakai toolchain standar (\texttt{gcc}/\texttt{clang}, \texttt{make}, \texttt{gdb} pengenalan) dari skrip konsol sederhana hingga program multi-berkas dengan manajemen memori dinamis.
+  \item \textbf{CPL-4 (Sikap):} Menunjukkan tanggung jawab di laboratorium, mematuhi K3 dan etika akademik (lisensi perangkat lunak, kejujuran tugas), serta mampu berkolaborasi saat tugas kelompok.
+  \item \textbf{CPL-5 (Profesionalisme praktis):} Memahami praktik dokumentasi singkat (\texttt{README}), peringatan kompilator (\texttt{-Wall -Wextra}), organisasi proyek kecil, coding standards, dan pengenalan debugging sebagai bekal kerja terstruktur.
+\end{itemize}
+
+\subsection*{C.2. Capaian pembelajaran mata kuliah (CPMK)}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{CPMK-1 (Fondasi):} Mahasiswa mampu menyiapkan toolchain C, memahami model kompilasi--penautan, menulis program dasar dengan sintaks C, mendeklarasikan variabel dan tipe data, menggunakan operator, serta melakukan masukan/keluaran terformat dengan \texttt{stdio}.\\
+  \textit{(Modul 1--4 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-2 (Kontrol Alur):} Mahasiswa mampu merancang alur program dengan percabangan (\texttt{if}, \texttt{else if}, \texttt{switch}) dan perulangan (\texttt{for}, \texttt{while}, \texttt{do-while}), termasuk pola bersarang dan kendali loop (\texttt{break}, \texttt{continue}).\\
+  \textit{(Modul 5--6 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-3 (Modularitas):} Mahasiswa mampu memecah program menjadi fungsi, memahami parameter, nilai balik, scope variabel, storage classes, rekursi dasar, serta organisasi multi-berkas dengan header dan include guards.\\
+  \textit{(Modul 7, 14, 20 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-4 (Data Agregat):} Mahasiswa mampu menggunakan larik (1D dan 2D) dan memanipulasi string dengan pustaka standar \texttt{<string.h>}, serta melakukan operasi dasar pada array (pencarian, pengurutan sederhana).\\
+  \textit{(Modul 8--9 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-5 (Pointer dan Struct):} Mahasiswa mampu menerapkan pointer (deklarasi, dereferensi, aritmetika, pointer ke array), \texttt{struct}, \texttt{union}, \texttt{enum}, \texttt{typedef}, serta simulasi pass-by-reference dan hubungan pointer--larik untuk agregasi data.\\
+  \textit{(Modul 10--11 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-6 (Memori Dinamis):} Mahasiswa mampu mengalokasikan dan melepaskan memori secara dinamis menggunakan \texttt{malloc()}, \texttt{calloc()}, \texttt{realloc()}, \texttt{free()}, memahami perbedaan stack vs heap, dan mengenali common pitfalls (memory leak, dangling pointer).\\
+  \textit{(Modul 12 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-7 (File dan Preprocessor):} Mahasiswa mampu melakukan akses berkas teks dan biner dengan API \texttt{FILE}, memahami preprocessor directive (\texttt{\#define}, \texttt{\#include}, \texttt{\#ifdef}), makro aman, dan include guards.\\
+  \textit{(Modul 13--14 pada sumber\_materi.md)}
+
+  \item \textbf{CPMK-8 (Struktur Data dan Integrasi):} Mahasiswa mampu mengimplementasikan struktur data dasar (linked list, stack, queue) menggunakan pointer dan alokasi dinamis, serta mengintegrasikan seluruh konsep dalam proyek mini multi-berkas.\\
+  \textit{(Modul 15, 20, 30 pada sumber\_materi.md)}
+\end{itemize}
+
+\subsection*{C.3. Sub-CPMK (indikator operasional)}
+
+\begin{description}[style=nextline,leftmargin=*]
+  \item[CPMK-1:] \hfill
+  \begin{itemize}[nosep]
+    \item 1.1 Instalasi/verifikasi kompilator (GCC/Clang), program pertama ``Hello World'', K3 lab, etika lisensi SW.
+    \item 1.2 Variabel, tipe data (\texttt{int}, \texttt{float}, \texttt{double}, \texttt{char}), modifier, \texttt{sizeof}, konstanta, type casting.
+    \item 1.3 Format I/O: \texttt{printf}/\texttt{scanf} dengan format specifier, escape sequences, buffer.
+    \item 1.4 Operator aritmatika, relasional, logika, assignment, increment/decrement, bitwise pengenalan, ternary, precedence.
+  \end{itemize}
+
+  \item[CPMK-2:] \hfill
+  \begin{itemize}[nosep]
+    \item 2.1 Percabangan: \texttt{if}/\texttt{else if}/\texttt{else}, \texttt{switch-case}, nested \texttt{if}, operator ternary.
+    \item 2.2 Perulangan: \texttt{for}, \texttt{while}, \texttt{do-while}, nested loop, \texttt{break}/\texttt{continue}/\texttt{goto}.
+  \end{itemize}
+
+  \item[CPMK-3:] \hfill
+  \begin{itemize}[nosep]
+    \item 3.1 Definisi fungsi, prototipe, parameter/nilai balik, scope (local/global), \texttt{static} pengenalan.
+    \item 3.2 Rekursi dasar: faktorial, Fibonacci; konsep base case dan stack frame.
+    \item 3.3 Pemisahan \texttt{.c}/\texttt{.h}, include guards, kompilasi multi-unit, \texttt{extern}.
+  \end{itemize}
+
+  \item[CPMK-4:] \hfill
+  \begin{itemize}[nosep]
+    \item 4.1 Array 1D: deklarasi, inisialisasi, iterasi; array 2D (matriks).
+    \item 4.2 String: array of \texttt{char}, null terminator, fungsi \texttt{<string.h>} (\texttt{strlen}, \texttt{strcpy}, \texttt{strncpy}, \texttt{strcmp}, \texttt{strcat}, \texttt{strchr}, \texttt{strtok}).
+    \item 4.3 Pencarian linear dan pengurutan sederhana (bubble sort) pada array.
+  \end{itemize}
+
+  \item[CPMK-5:] \hfill
+  \begin{itemize}[nosep]
+    \item 5.1 Pointer: deklarasi, \texttt{\&} (address-of), \texttt{*} (dereference), aritmetika pointer, pointer ke array.
+    \item 5.2 Pointer dan fungsi: simulasi pass-by-reference, pointer \texttt{void}, pointer \texttt{const}.
+    \item 5.3 \texttt{struct}: definisi, akses anggota, nested struct, array of struct, \texttt{typedef}.
+    \item 5.4 \texttt{union}, \texttt{enum}, bit fields (pengenalan).
+  \end{itemize}
+
+  \item[CPMK-6:] \hfill
+  \begin{itemize}[nosep]
+    \item 6.1 Stack vs heap; \texttt{malloc()}, \texttt{calloc()}: alokasi memori, pengecekan NULL.
+    \item 6.2 \texttt{realloc()}, \texttt{free()}: mengubah ukuran dan melepaskan memori.
+    \item 6.3 Common pitfalls: dangling pointer, double free, memory leak, buffer overflow.
+    \item 6.4 Array dan struct dinamis: alokasi array 1D/2D dinamis, linked data sederhana.
+  \end{itemize}
+
+  \item[CPMK-7:] \hfill
+  \begin{itemize}[nosep]
+    \item 7.1 File I/O: \texttt{fopen}/\texttt{fclose}, mode (\texttt{r}, \texttt{w}, \texttt{a}, \texttt{rb}, \texttt{wb}), \texttt{FILE *}.
+    \item 7.2 Membaca/menulis: \texttt{fgetc}, \texttt{fgets}, \texttt{fscanf}, \texttt{fread}, \texttt{fputc}, \texttt{fputs}, \texttt{fprintf}, \texttt{fwrite}.
+    \item 7.3 Posisi file: \texttt{fseek}, \texttt{ftell}, \texttt{rewind}; penanganan error: \texttt{ferror}, \texttt{perror}.
+    \item 7.4 Preprocessor: \texttt{\#define}, \texttt{\#include}, makro dengan parameter, kompilasi kondisional, include guards, \texttt{\_\_FILE\_\_}/\texttt{\_\_LINE\_\_}.
+  \end{itemize}
+
+  \item[CPMK-8:] \hfill
+  \begin{itemize}[nosep]
+    \item 8.1 Singly linked list: definisi node, insert, delete, traverse, search.
+    \item 8.2 Stack: implementasi dengan array dan linked list (push, pop, peek).
+    \item 8.3 Queue: implementasi dengan array dan linked list (enqueue, dequeue).
+    \item 8.4 Proyek integratif: program multi-berkas, \texttt{Makefile}, dokumentasi \texttt{README}.
+  \end{itemize}
+\end{description}
+
+\subsection*{C.4. Matriks pemetaan CPMK $\rightarrow$ CPL}
+
+{\small
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{CPMK} & \textbf{CPL-1} & \textbf{CPL-2} & \textbf{CPL-3} & \textbf{CPL-4} & \textbf{CPL-5} \\
+\hline
+CPMK-1 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+CPMK-2 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & \\
+CPMK-3 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ \\
+CPMK-4 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & \\
+CPMK-5 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & \\
+CPMK-6 & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ \\
+CPMK-7 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+CPMK-8 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\hline
+\end{tabular}
+}
+
+\vspace{0.35cm}
+
+\noindent\textbf{Matriks pemetaan minggu rencana (Sub-CPMK utama) $\rightarrow$ CPMK.} Lihat kolom Sub-CPMK dan bahan kajian pada Bagian E; ringkasan:
+
+{\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Minggu} & \textbf{CPMK} & \textbf{Modul sumber\_materi.md} \\
+\hline
+1--2 & CPMK-1 & Modul 1 (Pengenalan), 2 (Variabel \& Tipe Data) \\
+3 & CPMK-1 & Modul 3 (I/O), 4 (Operator) \\
+4 & CPMK-2 & Modul 5 (Percabangan) \\
+5 & CPMK-2 & Modul 6 (Perulangan) \\
+6 & CPMK-3 & Modul 7 (Fungsi) \\
+7 & CPMK-4 & Modul 8 (Array) \\
+8 & --- & \textbf{UTS} \\
+9 & CPMK-4 & Modul 9 (String) \\
+10 & CPMK-5 & Modul 10 (Pointer) \\
+11 & CPMK-5 & Modul 11 (Struct, Union, Enum) \\
+12 & CPMK-6 & Modul 12 (Manajemen Memori Dinamis) \\
+13 & CPMK-7 & Modul 13 (File Handling), 14 (Preprocessor) \\
+14 & CPMK-8 & Modul 15 (Linked List, Stack, Queue) \\
+15 & Lintas CPMK & Modul 20, 30 (Proyek integratif) \\
+16 & --- & \textbf{UAS} \\
+\hline
+\end{tabular}
+}
+
+\subsection*{C.5. Strategi analisis capaian}
+
+Urutan praktikum menggabungkan tiga struktur:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Prosedural:} Dari program linear (variabel, I/O), kontrol alur (percabangan, perulangan), fungsi, data agregat (array, string), pointer dan struct, manajemen memori, berkas, hingga struktur data --- setiap tahap menjadi fondasi tahap berikutnya.
+  \item \textbf{Hierarkis:} Keterampilan dasar (CPMK-1--2) menjadi prasyarat keterampilan menengah (CPMK-3--5), yang kemudian menjadi prasyarat keterampilan lanjutan (CPMK-6--8).
+  \item \textbf{Klaster integrasi:} UTS (minggu 8) mengukur CPMK-1--4; proyek integratif (minggu 15) dan UAS (minggu 16) memadukan seluruh CPMK dalam konteks program multi-berkas yang realistis.
+\end{enumerate}
+
+\noindent Materi lanjutan (Modul 16--30 pada \texttt{sumber\_materi.md}: sorting/searching, bitwise, debugging, function pointer, multithreading, network programming, fitur C23, secure coding) dirancang untuk semester lanjutan atau sebagai pengayaan bagi mahasiswa berprestasi.
+
+\vspace{0.75cm}
+
+% ============================================================
+% BAGIAN D — Ringkasan asesmen semester
+% ============================================================
+\section*{Bagian D. Ringkasan Asesmen Semester (Total 100\%)}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{5.8cm}|c|}
+\hline
+\textbf{Komponen} & \textbf{Teknik asesmen} & \textbf{Pemetaan CPMK / Sub-CPMK utama} & \textbf{Bobot (\%)} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Komponen} & \textbf{Teknik asesmen} & \textbf{Pemetaan CPMK / Sub-CPMK utama} & \textbf{Bobot (\%)} \\
+\hline
+\endhead
+\hline
+\endfoot
+
+Tugas praktikum mingguan & Latihan terstruktur di lab / unggah artefak & CPMK-1 s.d. CPMK-8 (sesuai minggu) & 25 \\
+\hline
+Laporan / log praktikum & Dokumen ringkas per modul atau portofolio & CPMK-1--8; bukti Sub-CPMK & 15 \\
+\hline
+Kinerja dan rubrik sesi & Observasi/checklist di lab & Sikap, K3, partisipasi (CPL-4); keterampilan sesuai Sub-CPMK & 10 \\
+\hline
+Ujian praktikum tengah (UTS) & Tes terbatas waktu (\textit{coding}) & CPMK-1--4; Sub-CPMK 1.1--4.3 & 20 \\
+\hline
+Proyek integratif / Mini Project & Program multi-berkas + \texttt{Makefile} + \texttt{README} & CPMK-3--8; integrasi pointer, struct, memori dinamis, linked list & 10 \\
+\hline
+Ujian praktikum akhir (UAS) & Tes komprehensif \textit{coding} + berkas pendukung & CPMK-5--8; integrasi pointer, memori, file, struktur data & 20 \\
+\hline
+\textbf{Jumlah} & & & \textbf{100} \\
+\hline
+\end{longtable}
+
+\noindent\textbf{Instrumen:} rubrik \textit{coding} (kebenaran, struktur, penanganan error, dokumentasi, \texttt{-Wall} clean), rubrik laporan, lembar observasi asisten, panduan revisi tugas, rubrik proyek.\\
+\noindent\textbf{Kriteria huruf (contoh):} A (85--100), B (70--84), C (60--69), D (50--59), E ($<$50) --- sesuaikan dengan polinom prodi.
+
+\vspace{0.75cm}
+
+% ============================================================
+% BAGIAN E — Tabel rencana mingguan
+% ============================================================
+\section*{Bagian E. Tabel Rencana Pembelajaran Mingguan}
+
+{\small
+\begin{landscape}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{|p{0.55cm}|p{2.35cm}|p{2.8cm}|p{1.65cm}|p{2.55cm}|p{1.0cm}|p{1.65cm}|p{3.0cm}|}
+\hline
+\textbf{Mgg} & \textbf{Sub-CPMK} & \textbf{Bahan kajian} & \textbf{Metode} & \textbf{Pengalaman belajar} & \textbf{Waktu} & \textbf{Asesmen} & \textbf{Referensi singkat} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Mgg} & \textbf{Sub-CPMK} & \textbf{Bahan kajian} & \textbf{Metode} & \textbf{Pengalaman belajar} & \textbf{Waktu} & \textbf{Asesmen} & \textbf{Referensi singkat} \\
+\hline
+\endhead
+\hline
+\endfoot
+
+1 & 1.1, K3, etika lab & \textbf{Modul 1:} Kontrak praktikum, K3, lisensi SW, sejarah C, instalasi GCC/Clang, proses kompilasi, program ``Hello World'', komentar, \texttt{-Wall} & \textit{Briefing}, demo, praktik & Checklist K3, refleksi; program pertama dengan peringatan bersih & $\pm$170' & Observasi, Tugas M1 & CS50x Week 1; Little Book of C; Petani Kode \\
+\hline
+2 & 1.2--1.3 & \textbf{Modul 2--3:} Variabel, tipe data (\texttt{int}, \texttt{float}, \texttt{char}), modifier, \texttt{sizeof}, konstanta; \texttt{printf}/\texttt{scanf} format specifier, escape sequences & Praktikum terbimbing & Latihan deklarasi variabel dan I/O terformat; konversi tipe & $\pm$170' & Tugas M2 & cppreference \texttt{stdio}; Programiz; W3Schools \\
+\hline
+3 & 1.4 & \textbf{Modul 4:} Operator aritmatika, relasional, logika, assignment, increment/decrement, bitwise dasar, ternary; precedence dan associativity & Demo, latihan & Latihan ekspresi kompleks; tabel precedence & $\pm$170' & Tugas M3 & cppreference operators; GeeksforGeeks \\
+\hline
+4 & 2.1 & \textbf{Modul 5:} Percabangan --- \texttt{if}, \texttt{if-else}, \texttt{else if} ladder, nested \texttt{if}, \texttt{switch-case} (\texttt{break}, \texttt{default}, fall-through) & PBL ringkas & Soal bertahap percabangan; kalkulator sederhana & $\pm$170' & Tugas M4 & Petani Kode; W3Schools; Learn-C.org \\
+\hline
+5 & 2.2 & \textbf{Modul 6:} Perulangan --- \texttt{for}, \texttt{while}, \texttt{do-while}, nested loop; \texttt{break}/\texttt{continue}; pola bintang/bilangan & Praktik berkelompok & Latihan pola loop, akumulasi, validasi input berulang & $\pm$170' & Tugas M5 & GeeksforGeeks; Learn-C.org; Programiz \\
+\hline
+6 & 3.1--3.2 & \textbf{Modul 7:} Fungsi --- deklarasi/definisi, parameter (by value), return, scope (local/global), storage classes pengenalan, rekursi dasar (faktorial, Fibonacci) & Demo, latihan & Pecah program menjadi fungsi; latihan rekursi sederhana & $\pm$170' & Tugas M6 & Beej's Guide; UNS EE0107-19 (PDF) \\
+\hline
+7 & 4.1--4.3 & \textbf{Modul 8:} Array --- 1D (deklarasi, inisialisasi, iterasi), 2D (matriks pengenalan); pencarian linear, bubble sort sederhana & Praktik terbimbing & Manipulasi array: cari min/max, sorting, statistik sederhana & $\pm$170' & Tugas M7 & cppreference array; Programiz \\
+\hline
+8 & CPMK-1--4 (utama) & \textbf{UTS PRAKTIKUM}: Variabel, I/O, operator, percabangan, perulangan, fungsi, array & Tes praktik & Soal \textit{coding} terbatas waktu & $\pm$170' & \textbf{UTS (20\%)} & --- \\
+\hline
+9 & 4.2 & \textbf{Modul 9:} String --- array of \texttt{char}, null terminator, I/O string; fungsi \texttt{<string.h>}: \texttt{strlen}, \texttt{strcpy}, \texttt{strncpy}, \texttt{strcmp}, \texttt{strcat}, \texttt{strchr}, \texttt{strtok}; konversi string-angka & Praktik terbimbing & Validasi input string, parsing sederhana, manipulasi kata & $\pm$170' & Tugas M8 & cppreference string.h; Petani Kode \\
+\hline
+10 & 5.1--5.2 & \textbf{Modul 10:} Pointer --- alamat memori (\texttt{\&}), dereferensi (\texttt{*}), pointer NULL; aritmetika pointer; pointer ke array; simulasi pass-by-reference; pointer \texttt{void} dan \texttt{const} & Demo, latihan & Latihan pointer: swap via pointer, traversal array dengan pointer & $\pm$170' & Tugas M9 & Beej's Guide; Modern C; cppreference \\
+\hline
+11 & 5.3--5.4 & \textbf{Modul 11:} Struct, Union, Enum --- definisi struct, akses anggota, nested struct, array of struct; \texttt{typedef}; pointer ke struct (\texttt{->}); \texttt{union} dan \texttt{enum}; bit fields pengenalan & Praktik mandiri & Program data mahasiswa/kontak dengan struct; pointer ke struct & $\pm$170' & Tugas M10 & Petani Kode; cppreference struct \\
+\hline
+12 & 6.1--6.4 & \textbf{Modul 12:} Manajemen Memori Dinamis --- stack vs heap; \texttt{malloc()}, \texttt{calloc()}, \texttt{realloc()}, \texttt{free()}; array dinamis; common pitfalls (leak, dangling pointer) & Demo, latihan & Array dinamis, struct dinamis; deteksi memory leak sederhana & $\pm$170' & Tugas M11 & cppreference stdlib; Modern C; Valgrind docs \\
+\hline
+13 & 7.1--7.4 & \textbf{Modul 13--14:} File Handling --- \texttt{fopen}/\texttt{fclose}, baca/tulis teks (\texttt{fgets}, \texttt{fprintf}), biner (\texttt{fread}, \texttt{fwrite}), posisi file; Preprocessor --- \texttt{\#define}, makro, kompilasi kondisional, include guards & Workshop & Baca/tulis file data; header file custom; Makefile sederhana & $\pm$170' & Tugas M12 & cppreference FILE; GCC manual; GNU C Ref \\
+\hline
+14 & 8.1--8.3 & \textbf{Modul 15:} Struktur Data --- Singly linked list (insert, delete, traverse); Stack (push, pop); Queue (enqueue, dequeue); implementasi pointer + \texttt{malloc} & Praktikum & Implementasi linked list dan stack dari nol & $\pm$170' & Tugas M13 & GeeksforGeeks; Programiz; Beej's Guide \\
+\hline
+15 & 8.4, lintas CPMK & \textbf{Mini Project:} Proyek konsol multi-berkas integratif --- menggabungkan struct, pointer, memori dinamis, file I/O, linked list; \texttt{Makefile} + \texttt{README} & Bimbingan proyek & Kode + \texttt{Makefile} + \texttt{README} + presentasi singkat & $\pm$170' & Proyek (10\%) & UNWAHAS JTI2403 (OBE); sumber\_materi.md Modul 20, 30 \\
+\hline
+16 & CPMK-5--8 (utama) & \textbf{UAS PRAKTIKUM}: Pointer, struct, memori dinamis, file I/O, preprocessor, linked list/stack/queue --- komprehensif & Tes praktik & \textit{Coding} + berkas pendukung & $\pm$170' & \textbf{UAS (20\%)} & --- \\
+\hline
+\end{longtable}
+\end{landscape}
+}
+
+\vspace{0.5cm}
+
+\noindent\textbf{Keterangan:} Nomor minggu disesuaikan dengan kalender akademik (libur nasional, pengganti). Modul internal merujuk \texttt{modul\_praktikum\_C} (penyusunan prodi). Nomor modul pada kolom ``Bahan kajian'' mengacu pada daftar 30 modul di \texttt{sumber\_materi.md}. Jika slot efektif berkurang, gabungkan baris yang berkaitan (misalnya: Modul 13--14 di satu minggu) atau sesuaikan dengan koordinator MK.
+
+\noindent\textbf{Catatan pengayaan:} Modul 16--30 di \texttt{sumber\_materi.md} (algoritma sorting/searching lanjut, rekursi \& backtracking, manipulasi bit, debugging GDB/Valgrind, pemrograman modular lanjut, pustaka standar deep dive, argumen command line, function pointer, struktur data lanjut, multithreading, network programming, fitur C11/C17/C23, secure coding, capstone project) tersedia sebagai bahan:
+\begin{itemize}[nosep]
+  \item Semester lanjutan (Pemrograman Lanjut / Struktur Data)
+  \item Pengayaan mandiri bagi mahasiswa berprestasi
+  \item Tugas tambahan opsional
+\end{itemize}
+
+\vspace{0.75cm}
+
+% ============================================================
+% BAGIAN F — Checklist SN-Dikti
+% ============================================================
+\section*{Bagian F. Checklist Selaras SN-Dikti (Verifikasi Sebelum Disahkan)}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Standar isi:} Bahan kajian selaras perkembangan IPTEKS dan capaian yang dijanjikan; urutan dari dasar (Modul 1--6) ke menengah (Modul 7--14) hingga integrasi (Modul 15, proyek) terdokumentasi pada Bagian E.
+  \item \textbf{Standar proses:} Metode praktikum dan pengalaman belajar mahasiswa jelas pada setiap minggu; proporsi aktivitas mahasiswa tinggi (student-centered).
+  \item \textbf{Standar penilaian:} Indikator, bobot, dan instrumen terhubung ke Sub-CPMK/CPMK; total 100\% pada Bagian D. Rubrik mencakup ranah kognitif, psikomotorik, dan afektif.
+  \item \textbf{Standar sarana dan prasarana:} Kebutuhan lab tercantum pada Bagian A; rencana alternatif (laptop mandiri, kontainer dev) dapat ditambahkan pada lampiran SOP.
+  \item \textbf{Kemutakhiran:} Cantumkan revisi RPS (tanggal/versi) pada blok identitas ketika dokumen disetujui; jadwalkan peninjauan berkala. Sumber materi diperbarui berkala di \texttt{sumber\_materi.md}.
+  \item \textbf{Penjajaran OBE:} Setiap minggu memiliki Sub-CPMK, bahan kajian, pengalaman belajar, dan asesmen yang konsisten serta terhubung ke CPMK dan CPL (Bagian C--E). Pemetaan eksplisit: 8 CPMK $\rightarrow$ 5 CPL.
+\end{itemize}
+
+\vspace{1cm}
+
+% ============================================================
+% Daftar referensi (sumber_materi.md)
+% ============================================================
+\section*{Daftar Referensi}
+
+\subsection*{RPS dan Kurikulum Acuan}
+
+\begin{enumerate}[leftmargin=*]
+  \item UNESA. \textit{RPS Praktikum Pemrograman Dasar} (D4 Manajemen Informatika, PDF). \url{https://sindig.unesa.ac.id/rps-pdf/d4-manajemen-informatika/prak-pemrograman-dasar.pdf}
+
+  \item UNS, Fakultas Teknik Elektro. \textit{RPS Pemrograman Dasar} EE0107-19 (PDF). \url{https://elektro.ft.uns.ac.id/wp-content/uploads/2020/08/RPS_EE0107-19_Pemrograman-Dasar.pdf}
+
+  \item UNWAHAS, Teknik Informatika. \textit{RPS Praktikum Algoritma dan Pemrograman} JTI2403 (OBE). \url{https://simpel.teknik.unwahas.ac.id/rps/191}
+\end{enumerate}
+
+\subsection*{Referensi Materi (Bahasa Inggris)}
+
+\begin{enumerate}[leftmargin=*,resume]
+  \item cppreference.com. \textit{C language and library reference} (C89--C23). \url{https://en.cppreference.com/w/c}
+
+  \item Learn-C.org. \textit{Interactive C tutorial}. \url{https://www.learn-c.org/}
+
+  \item The Little Book of C. \textit{Pengantar praktis C}. \url{https://little-book-of.github.io/c/books/en-US/book.html}
+
+  \item W3Schools. \textit{C Tutorial}. \url{https://www.w3schools.com/c/index.php}
+
+  \item Programiz. \textit{C Programming tutorial}. \url{https://www.programiz.com/c-programming}
+
+  \item GeeksforGeeks. \textit{C Programming language}. \url{https://www.geeksforgeeks.org/c-programming-language/}
+
+  \item TutorialsPoint. \textit{C Programming tutorial}. \url{https://www.tutorialspoint.com/cprogramming/index.htm}
+
+  \item Harvard CS50x. \textit{Week 1 --- C}. \url{https://cs50.harvard.edu/x/2026/weeks/1/}
+
+  \item Hall, B. \textit{Beej's Guide to C Programming}. \url{https://beej.us/guide/bgc/html/index.html}
+
+  \item Hall, B. \textit{Beej's Guide to Network Programming}. \url{https://beej.us/guide/bgnet/html/}
+
+  \item GNU Project. \textit{The GNU C Reference Manual}. \url{https://www.gnu.org/software/gnu-c-manual/gnu-c-manual.html}
+
+  \item Free Software Foundation. \textit{Using the GNU Compiler Collection (GCC)}. \url{https://gcc.gnu.org/onlinedocs/gcc/index.html}
+
+  \item Gustedt, J. \textit{Modern C} (edisi terbaru, C11--C23, buku teks bebas). \url{https://gustedt.gitlabpages.inria.fr/modern-c/}
+
+  \item SEI CERT. \textit{SEI CERT C Coding Standard}. \url{https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard}
+
+  \item Valgrind Developers. \textit{Valgrind Documentation}. \url{https://valgrind.org/docs/manual/manual.html}
+\end{enumerate}
+
+\subsection*{Referensi Materi (Bahasa Indonesia)}
+
+\begin{enumerate}[leftmargin=*,resume]
+  \item Petani Kode. \textit{Tutorial Pemrograman C}. \url{https://petanikode.com/tutorial/c}
+
+  \item Dicoding. \textit{Belajar Bahasa Pemrograman C untuk Pemula}. \url{https://www.dicoding.com/blog/belajar-bahasa-pemrograman-c-untuk-pemula/}
+\end{enumerate}
+
+\subsection*{Buku Referensi Klasik}
+
+\begin{enumerate}[leftmargin=*,resume]
+  \item Kernighan, B.W. \& Ritchie, D.M. \textit{The C Programming Language}, 2nd ed. Prentice Hall, 1988.
+
+  \item King, K.N. \textit{C Programming: A Modern Approach}, 2nd ed. W.W. Norton, 2008.
+
+  \item Gustedt, J. \textit{Modern C}. Manning, 2019 (edisi terbaru tersedia daring gratis).
+
+  \item van der Linden, P. \textit{Expert C Programming: Deep C Secrets}. Prentice Hall, 1994.
+\end{enumerate}
+
+\vspace{0.5cm}
+\noindent\textit{Daftar lengkap 30 modul materi dan referensi terbuka tersedia di} \texttt{sumber\_materi.md}.
+
+\vspace{1cm}
+
+\begin{flushright}
+\begin{tabular}{c}
+\ldots, \today \\[2cm]
+\textbf{(Nama dan tanda tangan dosen pengampu)}\\
+NIP. \ldots
+\end{tabular}
+\end{flushright}
+
+\end{document}

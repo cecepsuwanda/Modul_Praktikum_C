@@ -1,0 +1,294 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{8}}{}
+\begin{document}
+
+\chapter{String dan Pustaka \texttt{string.h}}
+
+\begin{subcpmk}
+  \item Sub-CPMK 4.2: String sebagai larik \texttt{char}; fungsi \texttt{string.h}: \texttt{strlen}, \texttt{strcpy}, \texttt{strncpy}, \texttt{strcmp}, \texttt{strcat}, \texttt{strchr}, \texttt{strtok}; konversi string-angka
+\end{subcpmk}
+
+\SesiRPS{9}{4.2}{$\sim$170 menit}{CPMK-4}
+
+% ============================================================
+\section{Konsep String dalam C}
+% ============================================================
+
+Berbeda dengan banyak bahasa modern yang memiliki tipe \texttt{string} bawaan, C merepresentasikan string sebagai \textbf{array of \texttt{char}} yang diakhiri oleh karakter khusus \textbf{null terminator} (\texttt{'\textbackslash 0'}, bernilai 0). Null terminator inilah yang membedakan string dari array karakter biasa --- semua fungsi pustaka string (\texttt{strlen}, \texttt{strcpy}, dll.) bergantung pada keberadaan null terminator untuk mengetahui di mana string berakhir.
+
+Konsekuensi penting dari desain ini: buffer untuk menyimpan string harus \textbf{berukuran minimal $n+1$} karakter, di mana $n$ adalah panjang string yang ingin disimpan (1 byte tambahan untuk null terminator). Lupa mengalokasikan ruang untuk null terminator adalah sumber bug yang sangat umum dalam pemrograman C. Selain itu, karena string adalah array, string tidak bisa dibandingkan dengan \texttt{==} (yang membandingkan alamat, bukan isi) --- gunakan \texttt{strcmp()} untuk membandingkan konten.
+
+\begin{konsep}
+\textbf{Representasi string \texttt{"Halo"} di memori:}
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\texttt{[0]} & \texttt{[1]} & \texttt{[2]} & \texttt{[3]} & \texttt{[4]} & \\
+\hline
+\texttt{'H'} & \texttt{'a'} & \texttt{'l'} & \texttt{'o'} & \texttt{'\textbackslash 0'} & $\leftarrow$ null terminator \\
+\hline
+\end{tabular}
+
+\texttt{strlen("Halo") = 4} (tidak menghitung null terminator), tetapi butuh \textbf{5 byte} memori.
+\end{konsep}
+
+% ============================================================
+\section{Deklarasi dan Inisialisasi String}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption=Cara mendeklarasikan dan menginisialisasi string]
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    // Cara 1: array dengan string literal (modifiable)
+    char nama1[] = "Budi";       // ukuran otomatis: 5 byte
+    
+    // Cara 2: array dengan ukuran eksplisit
+    char nama2[20] = "Siti";     // 20 byte, sisa diisi 0
+    
+    // Cara 3: pointer ke string literal (READ-ONLY!)
+    const char *pesan = "Halo";  // di area memori baca-saja
+    
+    // Cara 4: inisialisasi per karakter (jarang dipakai)
+    char huruf[] = {'A', 'B', 'C', '\0'};
+    
+    printf("nama1: %s (len=%zu)\n", nama1, strlen(nama1));
+    printf("nama2: %s (len=%zu)\n", nama2, strlen(nama2));
+    printf("pesan: %s\n", pesan);
+    printf("huruf: %s\n", huruf);
+    
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+\textbf{\texttt{char *p = "Hello"}} membuat pointer ke string literal yang \textbf{tidak boleh dimodifikasi} (read-only). Mencoba mengubahnya (misalnya \texttt{p[0] = 'h'}) menyebabkan \textit{undefined behavior} dan kemungkinan crash. Selalu gunakan \texttt{const char *} untuk pointer ke string literal.
+\end{catatan}
+
+% ============================================================
+\section{Input/Output String}
+% ============================================================
+
+{\small
+\begin{tabularx}{\textwidth}{@{}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{4.9cm}|>{\raggedright\arraybackslash}X|@{}}
+\hline
+\textbf{Fungsi} & \textbf{Kelebihan} & \textbf{Kekurangan / Catatan} \\
+\hline
+\texttt{scanf("\%s", buf)} & Mudah & Berhenti di spasi; risiko overflow \\
+\hline
+\texttt{scanf("\%19s", buf)} & Membatasi panjang & Masih berhenti di spasi \\
+\hline
+\texttt{fgets(buf, n, stdin)} & Membaca hingga newline; aman & Menyertakan \texttt{\textbackslash n} di buffer \\
+\hline
+\texttt{gets(buf)} & (tidak ada) & \textbf{JANGAN DIPAKAI} (dihapus di C11, tidak aman) \\
+\end{tabularx}
+\par
+}
+
+Dari pilihan di atas, \texttt{fgets} adalah cara yang direkomendasikan untuk membaca string karena aman terhadap buffer overflow dan mendukung spasi dalam input:
+
+\begin{lstlisting}[language=C,caption=Input string aman dengan \texttt{fgets}]
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char nama[50];
+    
+    printf("Masukkan nama lengkap: ");
+    fgets(nama, sizeof(nama), stdin);
+    
+    // Hapus newline di akhir (jika ada)
+    size_t len = strlen(nama);
+    if (len > 0 && nama[len - 1] == '\n') {
+        nama[len - 1] = '\0';
+    }
+    
+    printf("Halo, %s!\n", nama);
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Fungsi-fungsi \texttt{string.h}}
+% ============================================================
+
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Fungsi} & \textbf{Prototipe} & \textbf{Keterangan} \\
+\hline
+\texttt{strlen} & \texttt{size\_t strlen(const char *s)} & Panjang string (tanpa null terminator) \\
+\hline
+\texttt{strcpy} & \texttt{char *strcpy(dst, src)} & Salin string; \textbf{tidak aman} (tak cek ukuran) \\
+\hline
+\texttt{strncpy} & \texttt{char *strncpy(dst, src, n)} & Salin maks $n$ karakter; \textbf{harus} tambah null manual \\
+\hline
+\texttt{strcat} & \texttt{char *strcat(dst, src)} & Gabung string; hati-hati overflow \\
+\hline
+\texttt{strncat} & \texttt{char *strncat(dst, src, n)} & Gabung maks $n$ karakter \\
+\hline
+\texttt{strcmp} & \texttt{int strcmp(s1, s2)} & Bandingkan: 0 = sama, $<$0 atau $>$0 = beda \\
+\hline
+\texttt{strncmp} & \texttt{int strncmp(s1, s2, n)} & Bandingkan maks $n$ karakter \\
+\hline
+\texttt{strchr} & \texttt{char *strchr(s, c)} & Cari karakter pertama $c$ dalam $s$ \\
+\hline
+\texttt{strstr} & \texttt{char *strstr(hay, needle)} & Cari substring \\
+\hline
+\texttt{strtok} & \texttt{char *strtok(s, delim)} & Tokenisasi (pecah string berdasarkan delimiter) \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Demonstrasi fungsi string]
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char s1[50] = "Halo";
+    char s2[] = " Dunia";
+    
+    // strlen
+    printf("Panjang s1: %zu\n", strlen(s1));  // 4
+    
+    // strcat: gabungkan
+    strcat(s1, s2);
+    printf("Setelah strcat: \"%s\"\n", s1);   // "Halo Dunia"
+    
+    // strcmp: bandingkan
+    if (strcmp(s1, "Halo Dunia") == 0) {
+        printf("s1 sama dengan \"Halo Dunia\"\n");
+    }
+    
+    // strchr: cari karakter
+    char *p = strchr(s1, 'D');
+    if (p) printf("Karakter 'D' ditemukan: \"%s\"\n", p);
+    
+    // strstr: cari substring
+    char *q = strstr(s1, "Dun");
+    if (q) printf("Substring ditemukan: \"%s\"\n", q);
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Tokenisasi dengan \texttt{strtok}}
+% ============================================================
+
+\texttt{strtok} memecah string berdasarkan delimiter yang ditentukan. Fungsi ini \textbf{memodifikasi string asli} (mengganti delimiter dengan \textit{null terminator}). Fungsi ini memakai \textit{state internal}; karenanya, panggilan kedua dan seterusnya menggunakan \texttt{NULL} sebagai argumen pertama.
+
+\begin{lstlisting}[language=C,caption=Tokenisasi string]
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char kalimat[] = "satu,dua,tiga,empat";
+    
+    char *token = strtok(kalimat, ",");
+    int nomor = 1;
+    
+    while (token != NULL) {
+        printf("Token %d: %s\n", nomor, token);
+        token = strtok(NULL, ",");  // lanjutkan tokenisasi
+        nomor++;
+    }
+    
+    return 0;
+}
+/* Output:
+   Token 1: satu
+   Token 2: dua
+   Token 3: tiga
+   Token 4: empat
+*/
+\end{lstlisting}
+
+% ============================================================
+\section{Konversi String-Angka}
+% ============================================================
+
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Fungsi} & \textbf{Konversi} & \textbf{Catatan} \\
+\hline
+\texttt{atoi(s)} & String $\rightarrow$ \texttt{int} & Tidak mendeteksi error \\
+\hline
+\texttt{atof(s)} & String $\rightarrow$ \texttt{double} & Tidak mendeteksi error \\
+\hline
+\texttt{strtol(s, \&end, base)} & String $\rightarrow$ \texttt{long} & Deteksi error via \texttt{end} $+$ \texttt{errno} \\
+\hline
+\texttt{strtod(s, \&end)} & String $\rightarrow$ \texttt{double} & Deteksi error via \texttt{end} \\
+\hline
+\texttt{sprintf(buf, fmt, ...)} & Angka $\rightarrow$ string & Hati-hati overflow buffer \\
+\hline
+\texttt{snprintf(buf, n, ...)} & Angka $\rightarrow$ string & Aman (batasi ukuran) \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Konversi string ke angka]
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    const char *str_int = "12345";
+    const char *str_dbl = "3.14159";
+    
+    int n = atoi(str_int);
+    double d = atof(str_dbl);
+    
+    printf("atoi(\"%s\") = %d\n", str_int, n);
+    printf("atof(\"%s\") = %.5f\n", str_dbl, d);
+    
+    // Konversi angka ke string (snprintf aman)
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer), "Nilai = %d", n);
+    printf("snprintf: \"%s\"\n", buffer);
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item cppreference, \texttt{string.h}. \url{https://en.cppreference.com/w/c/string/byte}
+  \item Petani Kode, string. \url{https://petanikode.com/tutorial/c}
+  \item Beej's Guide, \textit{Strings}. \url{https://beej.us/guide/bgc/html/index.html}
+  \item Programiz, \textit{C Strings}. \url{https://www.programiz.com/c-programming/c-strings}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Buat program validasi perintah: baca string dari pengguna, bandingkan dengan ``LOGIN'', ``EXIT'', ``HELP'' menggunakan \texttt{strcmp}.
+  \item Buat program yang memecah kalimat menjadi kata-kata menggunakan \texttt{strtok}.
+  \item Buat program yang menghitung jumlah vokal dalam sebuah kalimat.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Mengapa \texttt{char *s = "hello"; s[0] = 'H';} menyebabkan crash?
+  \item Jelaskan perbedaan \texttt{strlen} dan \texttt{sizeof} pada string.
+  \item Mengapa kita tidak bisa membandingkan string dengan \texttt{==}?
+  \item Apa risiko \texttt{strcpy} dan bagaimana \texttt{strncpy} mengatasinya?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M7:} validasi perintah sederhana (mis.\ \texttt{LOGIN}/\texttt{EXIT}/\texttt{HELP}) dengan perbandingan string + program tokenisasi input CSV sederhana.
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya memahami representasi string sebagai array char + null terminator
+  \item Saya dapat menggunakan \texttt{fgets} untuk input string yang aman
+  \item Saya dapat menggunakan fungsi-fungsi \texttt{string.h} dasar
+  \item Saya memahami risiko buffer overflow pada operasi string
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas string dalam C sebagai array of char dengan null terminator, berbagai cara input/output string (dengan penekanan pada keamanan \texttt{fgets}), fungsi-fungsi \texttt{string.h} (strlen, strcpy, strcmp, strcat, strchr, strstr, strtok), dan konversi string-angka.
+
+\textbf{Poin kunci:} null terminator (\texttt{'\textbackslash 0'}) wajib; buffer = panjang string + 1; jangan gunakan \texttt{gets}; bandingkan string dengan \texttt{strcmp}, bukan \texttt{==}.
+
+\textbf{Kata kunci:} string, null terminator, \texttt{strlen}, \texttt{strcmp}, \texttt{strncpy}, \texttt{fgets}, \texttt{strtok}, buffer overflow
+\end{rangkuman}
+
+\end{document}

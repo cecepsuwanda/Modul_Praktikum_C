@@ -1,0 +1,274 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{1}}{}
+\begin{document}
+
+\chapter{Toolchain C, Program Pertama, dan Peringatan Kompilator}
+
+\begin{subcpmk}
+  \item Sub-CPMK 1.1: Memverifikasi kompilator, mengompilasi program pertama, memahami K3 dasar laboratorium
+  \item Sub-CPMK 1.2 (pengenalan): Tipe dan operator akan diperdalam pada Bab 2
+\end{subcpmk}
+
+\SesiRPS{2}{1.1--1.2}{$\sim$170 menit}{CPMK-1}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+
+Stasiun lab dengan \textbf{GCC} atau \textbf{Clang}, terminal, editor teks/IDE (VS Code, Code::Blocks, atau Neovim), akses dokumentasi \texttt{cppreference} sesuai kebijakan jaringan.
+
+% ============================================================
+\section{Sejarah dan Filosofi Bahasa C}
+% ============================================================
+
+Bahasa C diciptakan oleh \textbf{Dennis Ritchie} di \textbf{Bell Laboratories} pada awal tahun 1970-an sebagai evolusi dari bahasa B (turunan BCPL). Tujuan utamanya adalah menyediakan bahasa tingkat tinggi yang tetap mampu mengakses fitur \textit{low-level} perangkat keras, sehingga sistem operasi \textbf{UNIX} dapat ditulis ulang dari bahasa rakitan ke C. Keputusan ini menjadikan UNIX portabel dan menjadi fondasi bagi sebagian besar sistem operasi modern.
+
+Hingga saat ini, C tetap menjadi salah satu bahasa yang paling berpengaruh di dunia pemrograman. Bahasa-bahasa populer seperti \textbf{C++}, \textbf{Java}, \textbf{C\#}, dan bahkan \textbf{Python} (yang interpreter utamanya, CPython, ditulis dalam C) mengadopsi sintaks dan konsep dari C. Bahasa C juga masih menjadi pilihan utama untuk pengembangan sistem operasi, \textit{embedded systems}, driver perangkat keras, dan perangkat lunak yang membutuhkan performa tinggi karena efisiensi dan kontrol langsung terhadap memori yang ditawarkannya.
+
+\begin{catatan}
+C memiliki beberapa versi standar yang dikeluarkan oleh ISO/ANSI:
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{8.8cm}|}
+\hline
+\textbf{Standar} & \textbf{Tahun} & \textbf{Catatan} \\
+\hline
+C89/C90 (ANSI C) & 1989/1990 & Standar pertama; basis K\&R edisi 2 \\
+\hline
+C99 & 1999 & Komentar \texttt{//}, VLA, \texttt{<stdbool.h>}, \texttt{inline} \\
+\hline
+C11 & 2011 & \texttt{<threads.h>}, \texttt{<stdatomic.h>}, \texttt{\_Generic} \\
+\hline
+C17 & 2018 & Perbaikan bug C11, tanpa fitur baru \\
+\hline
+C23 & 2024 & \texttt{nullptr}, \texttt{constexpr}, \texttt{auto}, \texttt{typeof} \\
+\hline
+\end{tabular}
+}
+
+Praktikum ini menggunakan standar \textbf{C17} sebagai acuan utama.
+\end{catatan}
+
+% ============================================================
+\section{Proses Kompilasi Bahasa C}
+% ============================================================
+
+Proses mengubah kode sumber C (\texttt{.c}) menjadi program yang dapat dijalankan (\textit{executable}) melibatkan beberapa tahapan yang dilakukan secara berurutan. Memahami tahapan ini penting agar mahasiswa dapat mendiagnosis kesalahan yang terjadi pada tahap yang tepat --- misalnya, kesalahan \texttt{\#include} terjadi pada tahap praprosesor, sedangkan kesalahan ``\textit{undefined reference}'' terjadi pada tahap penautan (\textit{linking}).
+
+Secara umum, kompilator \texttt{gcc} mengeksekusi seluruh tahapan berikut secara terintegrasi dalam satu perintah, namun secara internal prosesnya terbagi menjadi empat langkah utama:
+
+\begin{konsep}
+\textbf{Empat Tahapan Kompilasi:}
+
+\begin{tabular}{|c|l|l|l|}
+\hline
+\textbf{No} & \textbf{Tahap} & \textbf{Input $\rightarrow$ Output} & \textbf{Opsi GCC} \\
+\hline
+1 & Praprosesor & \texttt{.c} $\rightarrow$ \texttt{.i} (kode terproses) & \texttt{gcc -E} \\
+\hline
+2 & Kompilasi & \texttt{.i} $\rightarrow$ \texttt{.s} (assembly) & \texttt{gcc -S} \\
+\hline
+3 & Assembler & \texttt{.s} $\rightarrow$ \texttt{.o} (objek biner) & \texttt{gcc -c} \\
+\hline
+4 & Linker (penaut) & \texttt{.o} $\rightarrow$ executable & \texttt{gcc} (default) \\
+\hline
+\end{tabular}
+\end{konsep}
+
+Tahap \textbf{praprosesor} menangani semua directive yang diawali tanda \texttt{\#} (seperti \texttt{\#include} dan \texttt{\#define}) --- ia menggabungkan isi header file ke dalam kode sumber dan mengganti semua makro. Tahap \textbf{kompilasi} menerjemahkan kode C menjadi instruksi assembly khusus arsitektur prosesor. Tahap \textbf{assembler} mengubah assembly menjadi kode mesin dalam format objek (\texttt{.o}). Terakhir, tahap \textbf{linker} menggabungkan satu atau lebih berkas objek dengan pustaka standar C (\texttt{libc}) untuk menghasilkan program yang siap dijalankan.
+
+% ============================================================
+\section{Opsi Kompilator GCC yang Penting}
+% ============================================================
+
+Kompilator GCC menyediakan banyak opsi (\textit{flags}) yang mengontrol perilaku kompilasi. Dalam praktikum ini, mahasiswa \textbf{wajib} menggunakan opsi peringatan agar terbiasa menulis kode yang bersih dan aman sejak awal. Berikut opsi-opsi yang paling sering digunakan:
+
+\begin{tabular}{|l|p{9.5cm}|}
+\hline
+\textbf{Opsi} & \textbf{Keterangan} \\
+\hline
+\texttt{-Wall} & Mengaktifkan sebagian besar peringatan umum (variabel tidak digunakan, tipe tidak cocok, dll.) \\
+\hline
+\texttt{-Wextra} & Peringatan tambahan yang tidak dicakup \texttt{-Wall} \\
+\hline
+\texttt{-Wpedantic} & Peringatan untuk konstruksi yang tidak sesuai standar ISO C \\
+\hline
+\texttt{-std=c17} & Menggunakan standar bahasa C17 \\
+\hline
+\texttt{-g} & Menyertakan informasi debug (untuk digunakan dengan \texttt{gdb}) \\
+\hline
+\texttt{-o nama} & Menentukan nama file output (executable) \\
+\hline
+\texttt{-c} & Hanya kompilasi (menghasilkan \texttt{.o}), tanpa linking \\
+\hline
+\texttt{-E} & Hanya jalankan praprosesor, tampilkan hasilnya \\
+\hline
+\texttt{-Werror} & Memperlakukan semua peringatan sebagai error \\
+\hline
+\texttt{-O2} & Optimasi level 2 (untuk program rilis; tidak dipakai saat debug) \\
+\hline
+\end{tabular}
+
+\begin{contoh}
+Perintah kompilasi standar yang direkomendasikan untuk praktikum:
+
+\texttt{gcc -Wall -Wextra -std=c17 -g -o nama\_program berkas.c}
+
+Penjelasan: mengompilasi \texttt{berkas.c} dengan peringatan lengkap, standar C17, informasi debug, dan menghasilkan executable bernama \texttt{nama\_program}.
+\end{contoh}
+
+% ============================================================
+\section{Struktur Dasar Program C}
+% ============================================================
+
+Setiap program C memiliki struktur dasar yang terdiri dari: \textit{preprocessor directives} (baris yang diawali \texttt{\#}), deklarasi fungsi, dan setidaknya satu fungsi \texttt{main()} yang menjadi titik awal eksekusi program. Fungsi \texttt{main()} mengembalikan nilai \texttt{int} ke sistem operasi --- nilai \texttt{0} menandakan program berakhir dengan sukses, sedangkan nilai selain \texttt{0} menandakan adanya kesalahan.
+
+Komentar dalam C berfungsi sebagai dokumentasi di dalam kode yang diabaikan oleh kompilator. C mendukung dua gaya komentar: komentar baris tunggal (\texttt{//}) yang berlaku hingga akhir baris (tersedia sejak C99), dan komentar blok (\texttt{/* ... */}) yang dapat mencakup beberapa baris. Penggunaan komentar yang baik sangat penting untuk keterbacaan dan pemeliharaan kode, terutama dalam proyek tim.
+
+% ============================================================
+\section{Studi Kasus: \texttt{hello.c}}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption={\texttt{contoh\_code/c/hello.c} --- Program pertama}]
+/* hello.c - contoh minimal Praktikum Pemrograman C */
+#include <stdio.h>  // menyertakan pustaka I/O standar
+
+int main(void) {
+    // mencetak teks ke layar, \n = baris baru
+    printf("Halo, laboratorium C!\n");
+    return 0;  // 0 berarti sukses
+}
+\end{lstlisting}
+
+\begin{catatan}
+Contoh berikut adalah versi program \texttt{hello.c} yang merupakan konversi dari bahasa Pascal. Pola yang sama dipakai sebagai referensi latihan konversi kode.
+\end{catatan}
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/hello.c} --- Konversi dari Pascal}]{../contoh_code/c/hello.c}
+
+\textbf{Penjelasan baris per baris:}
+
+\begin{tabular}{|c|p{11cm}|}
+\hline
+\textbf{Baris} & \textbf{Penjelasan} \\
+\hline
+1 & Komentar blok --- diabaikan oleh kompilator \\
+\hline
+2 & Praprosesor menyertakan isi \texttt{stdio.h} (berisi deklarasi \texttt{printf}) \\
+\hline
+4 & Definisi fungsi \texttt{main}: titik masuk program; \texttt{void} berarti tidak menerima argumen \\
+\hline
+6 & \texttt{printf} mencetak string ke \textit{standard output}; \texttt{\textbackslash n} menggerakkan kursor ke baris baru \\
+\hline
+7 & \texttt{return 0} mengembalikan kode keluar 0 ke OS (artinya sukses) \\
+\hline
+\end{tabular}
+
+% ============================================================
+\section{Prosedur Kerja Praktikum}
+% ============================================================
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Verifikasi kompilator:} jalankan \texttt{gcc --version} atau \texttt{clang --version} di terminal. Catat versi pada log praktikum.
+  \item \textbf{Buat kode sumber:} buka editor, ketik program \texttt{hello.c} di atas, simpan.
+  \item \textbf{Kompilasi:} jalankan perintah berikut di terminal:
+  \begin{verbatim}
+  gcc -Wall -Wextra -std=c17 -o hello hello.c
+  \end{verbatim}
+  \item \textbf{Jalankan:} ketik \texttt{./hello} (Linux/macOS) atau \texttt{hello.exe} (Windows).
+  \item \textbf{Baca peringatan:} jika ada peringatan dari kompilator, perbaiki kode hingga bebas peringatan.
+\end{enumerate}
+
+% ============================================================
+\section{Contoh Tambahan: Program dengan Variabel Sederhana}
+% ============================================================
+
+\begin{lstlisting}[language=C,caption={Program dengan variabel dan return value}]
+#include <stdio.h>
+
+int main(void) {
+    int tahun = 2026;         // deklarasi + inisialisasi
+    char huruf = 'C';         // tipe karakter (1 byte)
+
+    printf("Selamat datang di Praktikum %c!\n", huruf);
+    printf("Tahun akademik: %d\n", tahun);
+
+    return 0;
+}
+\end{lstlisting}
+
+Program di atas mendemonstrasikan penggunaan dua tipe data dasar: \texttt{int} untuk bilangan bulat dan \texttt{char} untuk satu karakter. Perhatikan bahwa karakter literal diapit tanda kutip tunggal (\texttt{'}), sedangkan string diapit tanda kutip ganda (\texttt{"}). Fungsi \texttt{printf} menggunakan \textit{format specifier} \texttt{\%d} untuk menampilkan bilangan bulat dan \texttt{\%c} untuk menampilkan karakter --- konsep ini akan diperdalam pada Bab 2.
+
+% ============================================================
+\section{Contoh Kode Konversi: Variabel dan Assignment}
+% ============================================================
+
+Berikut adalah contoh program yang mendemonstrasikan penggunaan variabel string, integer, dan assignment nilai --- hasil konversi dari kode Pascal \texttt{hello2.pas}.
+
+\lstinputlisting[language=C,caption={\texttt{contoh\_code/c/hello2.c} --- Variabel dan assignment (konversi Pascal)}]{../contoh_code/c/hello2.c}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+
+\begin{itemize}[leftmargin=*]
+  \item Harvard CS50x, \textit{Week 1 --- C}. \url{https://cs50.harvard.edu/x/2026/weeks/1/}
+  \item The Little Book of C. \url{https://little-book-of.github.io/c/books/en-US/book.html}
+  \item cppreference, \textit{Program startup (main)}. \url{https://en.cppreference.com/w/c/language/main_function}
+  \item Petani Kode, \textit{Pengenalan Bahasa C}. \url{https://petanikode.com/tutorial/c}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Catat versi kompilator stasiun Anda pada log praktikum.
+  \item Kompilasi \texttt{hello.c} dengan \texttt{-Wall -Wextra}; salin peringatan (jika ada) ke laporan.
+  \item Ubah pesan \texttt{printf} agar memuat nama dan NIM Anda.
+  \item Coba kompilasi hanya sampai tahap praprosesor (\texttt{gcc -E hello.c}) dan amati hasilnya --- berapa baris yang dihasilkan? Mengapa jumlahnya jauh lebih banyak dari kode asli?
+  \item Tambahkan variabel \texttt{int} untuk menyimpan semester Anda, lalu cetak nilainya.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Jelaskan perbedaan berkas \texttt{.c}, \texttt{.o}, dan program jadi (\textit{executable}).
+  \item Apa fungsi opsi \texttt{-std=c17}? Apa yang terjadi jika Anda menggunakan \texttt{-std=c99}?
+  \item Apa perbedaan antara komentar \texttt{//} dan \texttt{/* */}?
+  \item Mengapa \texttt{main()} harus mengembalikan \texttt{int}? Apa arti nilai \texttt{0}?
+  \item Refleksi: komponen toolchain mana yang paling baru bagi Anda?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Formatif (Tugas M1):} unggah \texttt{NIM\_TIF1xx\_M01\_tugas.c} berisi program yang mencetak nama, NIM, dan semester Anda, serta tangkapan layar perintah kompilasi sukses dengan \texttt{-Wall -Wextra}.
+
+\textbf{Rubrik singkat:}
+
+\begin{tabular}{|l|c|p{7cm}|}
+\hline
+\textbf{Aspek} & \textbf{Bobot} & \textbf{Indikator} \\
+\hline
+Kompilasi sukses & 40\% & Tidak ada error; peringatan minimal \\
+\hline
+Keluaran sesuai & 30\% & Nama, NIM, semester tercetak benar \\
+\hline
+Penggunaan flag & 20\% & \texttt{-Wall -Wextra} digunakan \\
+\hline
+Keberesan berkas & 10\% & Nama file sesuai konvensi \\
+\hline
+\end{tabular}
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya dapat mengompilasi program C dari terminal
+  \item Saya memahami arti opsi \texttt{-Wall} dan \texttt{-Wextra}
+  \item Saya memahami empat tahapan proses kompilasi
+  \item Saya mengetahui perbedaan \texttt{.c}, \texttt{.o}, dan executable
+  \item Saya menyimpan artefak sesuai konvensi penamaan
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas sejarah bahasa C dan relevansinya hingga saat ini, proses kompilasi empat tahap (praprosesor $\rightarrow$ kompilasi $\rightarrow$ assembler $\rightarrow$ linker), opsi-opsi penting kompilator GCC, struktur dasar program C, serta program \texttt{main} minimal.
+
+\textbf{Poin kunci:} \texttt{gcc -Wall -Wextra -std=c17 -g}; \texttt{int main(void)}; nilai balik \texttt{0} = sukses; komentar untuk dokumentasi.
+
+\textbf{Kata kunci:} toolchain, kompilasi, praprosesor, linker, \texttt{stdio.h}, \texttt{printf}, \texttt{main}
+\end{rangkuman}
+
+\end{document}

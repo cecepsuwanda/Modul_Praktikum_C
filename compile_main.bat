@@ -13,7 +13,6 @@ echo ============================================================
 
 pushd "%SOURCE_DIR%"
 
-REM Check for latexmk AND perl
 where latexmk >nul 2>nul
 if errorlevel 1 (
     echo Latexmk not found. Using pdflatex loop...
@@ -41,7 +40,7 @@ pdflatex -interaction=nonstopmode -halt-on-error -output-directory="%OUTPUT_DIR%
 if errorlevel 1 goto :failed
 
 echo Running Stage 2: bibtex...
-bibtex "%OUTPUT_DIR%\main"
+bibtex "%OUTPUT_DIR%\main" 2>nul
 
 echo Running Stage 3: pdflatex...
 pdflatex -interaction=nonstopmode -halt-on-error -output-directory="%OUTPUT_DIR%" "main.tex"
@@ -68,6 +67,16 @@ echo.
 echo ERROR: Compilation failed.
 goto :end
 
+:end_fail
+echo.
+pause
+exit /b 1
+
+:end
+echo.
+pause
+exit /b 0
+
 :cleanup
 set "TARGET_FOLDER=%~1"
 pushd "%TARGET_FOLDER%"
@@ -76,8 +85,3 @@ for %%E in (aux bbl blg bcf out toc lof lot fls fdb_latexmk nav snm vrb idx ilg 
 )
 popd
 exit /b 0
-:end
-echo.
-pause
-exit /b 0
-

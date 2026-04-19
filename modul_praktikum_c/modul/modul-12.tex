@@ -1,0 +1,342 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{12}}{}
+\begin{document}
+
+\chapter{Preprocessor, \texttt{Makefile}, dan \texttt{gdb} Pengenalan}
+
+\begin{subcpmk}
+  \item Sub-CPMK 7.4: Preprocessor directive: \texttt{\#define}, \texttt{\#include}, makro dengan parameter, kompilasi kondisional, include guards, predefined macros
+  \item Sub-CPMK 6.2 (lanjutan): Target \texttt{Makefile} dan otomasi build
+  \item Sub-CPMK 6.3 (lanjutan): \texttt{gdb}: breakpoint, \texttt{run}, \texttt{backtrace} pada program kecil
+\end{subcpmk}
+
+\SesiRPS{13}{7.4, 6.2--6.3}{$\sim$170 menit}{CPMK-7}
+
+% ============================================================
+\section{Sarana dan prasarana}
+% ============================================================
+\texttt{make} (atau \texttt{mingw32-make} di Windows), \texttt{gdb}, dokumentasi GCC.
+
+% ============================================================
+\section{Preprocessor: Apa dan Mengapa}
+% ============================================================
+
+Preprocessor adalah tahap \textbf{pertama} dalam proses kompilasi C --- ia memproses semua baris yang diawali tanda \texttt{\#} \textbf{sebelum} kompilator melihat kode. Preprocessor melakukan manipulasi teks: menyertakan isi file header, mengganti makro dengan nilainya, dan memasukkan atau mengeluarkan blok kode berdasarkan kondisi. Outputnya adalah kode C ``murni'' yang kemudian dikompilasi.
+
+Memahami preprocessor penting karena banyak konstruksi C bergantung padanya --- termasuk \texttt{\#include} yang kita gunakan di setiap program, \texttt{\#define} untuk konstanta, include guards untuk mencegah penyertaan ganda, dan kompilasi kondisional untuk membuat kode portabel antar platform.
+
+% ============================================================
+\section{Tabel Directive Preprocessor}
+% ============================================================
+
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}p{9.4cm}|}
+\hline
+\textbf{Directive} & \textbf{Keterangan} \\
+\hline
+\texttt{\#include <file>} & Menyertakan header sistem (dicari di path sistem) \\
+\hline
+\texttt{\#include "file"} & Menyertakan header lokal (dicari di direktori saat ini dulu) \\
+\hline
+\texttt{\#define NAMA nilai} & Mendefinisikan makro (penggantian teks) \\
+\hline
+\texttt{\#define NAMA(x) ((x)*(x))} & Makro dengan parameter (function-like macro) \\
+\hline
+\texttt{\#undef NAMA} & Menghapus definisi makro \\
+\hline
+\texttt{\#ifdef NAMA} / \texttt{\#ifndef} & Kompilasi kondisional berdasarkan ada/tidaknya makro \\
+\hline
+\texttt{\#if expr} / \texttt{\#elif} / \texttt{\#else} / \texttt{\#endif} & Kompilasi kondisional berdasarkan ekspresi \\
+\hline
+\texttt{\#pragma once} & Include guard non-standar (didukung mayoritas compiler) \\
+\hline
+\texttt{\#error "pesan"} & Menghasilkan error kompilasi dengan pesan kustom \\
+\hline
+\end{tabular}
+}
+
+% ============================================================
+\section{Makro \texttt{\#define}}
+% ============================================================
+
+\subsection{Makro Objek (Konstanta)}
+
+\begin{lstlisting}[language=C,caption=Makro konstanta]
+#define MAX_SISWA   40
+#define PI          3.14159265
+#define NAMA_PRODI  "Teknik Informatika"
+
+printf("Prodi: %s, Max siswa: %d\n", NAMA_PRODI, MAX_SISWA);
+\end{lstlisting}
+
+\subsection{Makro Fungsi (Dengan Parameter)}
+
+Makro fungsi melakukan penggantian teks dengan parameter. \textbf{Selalu bungkus} parameter dan seluruh ekspresi dalam tanda kurung untuk menghindari bug dari precedence operator.
+
+\begin{lstlisting}[language=C,caption=Makro fungsi --- benar dan berbahaya]
+// BENAR: parameter dan ekspresi dibungkus kurung
+#define KUADRAT(x) ((x) * (x))
+#define MAKS(a, b) ((a) > (b) ? (a) : (b))
+
+// BERBAHAYA: tanpa kurung
+#define BURUK(x) x * x
+// BURUK(1+2) -> 1+2 * 1+2 = 1+2+2 = 5 (bukan 9!)
+
+#include <stdio.h>
+int main(void) {
+    printf("KUADRAT(1+2) = %d\n", KUADRAT(1+2));  // 9 (benar)
+    printf("BURUK(1+2) = %d\n", BURUK(1+2));       // 5 (salah!)
+    printf("MAKS(3, 7) = %d\n", MAKS(3, 7));       // 7
+    return 0;
+}
+\end{lstlisting}
+
+\begin{catatan}
+\textbf{Makro vs Fungsi:} Makro lebih cepat (tidak ada overhead pemanggilan) tetapi tidak memiliki pengecekan tipe, bisa menyebabkan efek samping (\texttt{KUADRAT(x++)} mengevaluasi \texttt{x++} dua kali!), dan lebih sulit di-debug. Untuk kode modern, lebih disarankan menggunakan fungsi \texttt{inline} (C99) atau fungsi biasa.
+\end{catatan}
+
+% ============================================================
+\section{Kompilasi Kondisional}
+% ============================================================
+
+Kompilasi kondisional memungkinkan blok kode dimasukkan atau dikeluarkan dari kompilasi berdasarkan kondisi tertentu. Ini sangat berguna untuk: kode debug yang hanya aktif saat pengembangan, kode portabel antar platform (Windows vs Linux), dan fitur opsional.
+
+\begin{lstlisting}[language=C,caption=Kompilasi kondisional]
+#include <stdio.h>
+
+#define DEBUG  // aktifkan mode debug (hapus untuk menonaktifkan)
+
+int main(void) {
+    int x = 42;
+    
+    #ifdef DEBUG
+        printf("[DEBUG] x = %d, alamat = %p\n", x, (void*)&x);
+    #endif
+    
+    printf("Nilai: %d\n", x);
+    
+    #if defined(_WIN32)
+        printf("Platform: Windows\n");
+    #elif defined(__linux__)
+        printf("Platform: Linux\n");
+    #elif defined(__APPLE__)
+        printf("Platform: macOS\n");
+    #else
+        printf("Platform: tidak dikenal\n");
+    #endif
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Predefined Macros}
+% ============================================================
+
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Makro} & \textbf{Isi} \\
+\hline
+\texttt{\_\_FILE\_\_} & Nama file sumber saat ini (string) \\
+\hline
+\texttt{\_\_LINE\_\_} & Nomor baris saat ini (integer) \\
+\hline
+\texttt{\_\_DATE\_\_} & Tanggal kompilasi (string: ``Apr 20 2026'') \\
+\hline
+\texttt{\_\_TIME\_\_} & Waktu kompilasi (string: ``14:30:00'') \\
+\hline
+\texttt{\_\_func\_\_} & Nama fungsi saat ini (C99+) \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Menggunakan predefined macros untuk log]
+#include <stdio.h>
+
+#define LOG(msg) printf("[%s:%d %s] %s\n", \
+    __FILE__, __LINE__, __func__, msg)
+
+int main(void) {
+    LOG("Program dimulai");
+    
+    int x = 10;
+    LOG("Variabel x diinisialisasi");
+    
+    printf("Dikompilasi: %s %s\n", __DATE__, __TIME__);
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Makefile: Otomasi Build}
+% ============================================================
+
+\texttt{Makefile} adalah skrip untuk program \texttt{make} yang mengotomasi kompilasi --- menentukan file mana yang bergantung pada file lain dan perintah apa yang dijalankan. Pada proyek multi-file, \texttt{Makefile} memastikan hanya file yang berubah yang dikompilasi ulang, menghemat waktu secara signifikan.
+
+\begin{lstlisting}[language=make,caption=Makefile dengan penjelasan]
+# Variabel
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c17 -g
+TARGET = program
+SRCS = main.c mathutil.c
+OBJS = main.o mathutil.o    # .c -> .o
+
+# Target default
+all: $(TARGET)
+
+# Linking: gabungkan semua .o
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+# Kompilasi: .c -> .o (aturan implisit)
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Dependency header
+main.o: main.c mathutil.h
+mathutil.o: mathutil.c mathutil.h
+
+# Bersihkan
+clean:
+	rm -f $(TARGET) $(OBJS)
+
+# Jalankan program
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run
+\end{lstlisting}
+
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Simbol Make} & \textbf{Arti} \\
+\hline
+\texttt{\$@} & Nama target \\
+\hline
+\texttt{\$<} & Prerequsite pertama \\
+\hline
+\texttt{\$\^{}} & Semua prerequsite \\
+\hline
+\texttt{\%.o: \%.c} & Pattern rule: setiap \texttt{.o} dari \texttt{.c} yang sesuai \\
+\hline
+\texttt{.PHONY} & Target yang bukan file (selalu dieksekusi) \\
+\hline
+\end{tabular}
+
+\begin{catatan}
+Pada Windows dengan MinGW, gunakan \texttt{mingw32-make} sebagai pengganti \texttt{make}. Target \texttt{clean} mungkin perlu menggunakan \texttt{del} alih-alih \texttt{rm -f}.
+\end{catatan}
+
+% ============================================================
+\section{GDB: Debugger Pengenalan}
+% ============================================================
+
+\texttt{gdb} (\textit{GNU Debugger}) memungkinkan kita menjalankan program langkah demi langkah, memeriksa nilai variabel, dan menemukan sumber bug. Untuk menggunakan \texttt{gdb}, kompilasi program dengan opsi \texttt{-g} (menyertakan informasi debug).
+
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Perintah GDB} & \textbf{Keterangan} \\
+\hline
+\texttt{gdb ./program} & Mulai GDB dengan program yang akan di-debug \\
+\hline
+\texttt{break main} & Set breakpoint di awal fungsi \texttt{main} \\
+\hline
+\texttt{break file.c:15} & Set breakpoint di baris 15 \\
+\hline
+\texttt{run} / \texttt{r} & Jalankan program \\
+\hline
+\texttt{next} / \texttt{n} & Jalankan satu baris (lewati fungsi) \\
+\hline
+\texttt{step} / \texttt{s} & Jalankan satu baris (masuk ke fungsi) \\
+\hline
+\texttt{print x} / \texttt{p x} & Tampilkan nilai variabel \texttt{x} \\
+\hline
+\texttt{backtrace} / \texttt{bt} & Tampilkan call stack \\
+\hline
+\texttt{continue} / \texttt{c} & Lanjutkan sampai breakpoint berikutnya \\
+\hline
+\texttt{quit} / \texttt{q} & Keluar dari GDB \\
+\hline
+\texttt{list} / \texttt{l} & Tampilkan kode sumber di sekitar posisi saat ini \\
+\hline
+\texttt{info locals} & Tampilkan semua variabel lokal \\
+\hline
+\texttt{watch x} & Berhenti ketika nilai \texttt{x} berubah \\
+\hline
+\end{tabular}
+
+\begin{contoh}
+\textbf{Contoh sesi GDB:}
+
+\begin{verbatim}
+$ gcc -Wall -Wextra -std=c17 -g -o program main.c
+$ gdb ./program
+(gdb) break main
+Breakpoint 1 at 0x...: file main.c, line 5.
+(gdb) run
+Starting program: ./program
+Breakpoint 1, main () at main.c:5
+5       int x = 10;
+(gdb) next
+6       int y = 20;
+(gdb) print x
+$1 = 10
+(gdb) next
+7       int z = x + y;
+(gdb) print y
+$2 = 20
+(gdb) next
+(gdb) print z
+$3 = 30
+(gdb) backtrace
+#0  main () at main.c:8
+(gdb) quit
+\end{verbatim}
+\end{contoh}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item GCC manual, preprocessor. \url{https://gcc.gnu.org/onlinedocs/gcc/index.html}
+  \item GNU C Reference, preprocessor. \url{https://www.gnu.org/software/gnu-c-manual/gnu-c-manual.html}
+  \item GNU Make Manual. \url{https://www.gnu.org/software/make/manual/make.html}
+  \item GDB Documentation. \url{https://sourceware.org/gdb/current/onlinedocs/gdb/}
+  \item UNWAHAS JTI2403 (struktur OBE praktikum). \url{https://simpel.teknik.unwahas.ac.id/rps/191}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Buat \texttt{Makefile} dengan target \texttt{all}, \texttt{clean}, dan \texttt{run} untuk proyek multi-file.
+  \item Kompilasi dengan \texttt{-g} dan lakukan sesi GDB: set breakpoint, jalankan langkah demi langkah, periksa variabel.
+  \item Buat makro \texttt{LOG} yang mencetak file, baris, dan pesan.
+  \item Buat program dengan \texttt{\#ifdef DEBUG} untuk mencetak informasi debug opsional.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Mengapa makro \texttt{\#define KUADRAT(x) x*x} berbahaya? Berikan contoh.
+  \item Apa keuntungan kompilasi terpisah (\texttt{.c} $\rightarrow$ \texttt{.o} $\rightarrow$ executable)?
+  \item Jelaskan perbedaan \texttt{next} dan \texttt{step} di GDB.
+  \item Bagaimana cara membuat Makefile yang hanya mengompilasi ulang file yang berubah?
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M11:} proyek kecil multi-berkas (min.\ 3 file) + \texttt{Makefile} fungsional + cuplikan sesi \texttt{gdb} (perintah dan keluaran, screenshot terminal).
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya memahami directive preprocessor utama
+  \item Saya dapat menulis makro yang aman (dengan kurung)
+  \item Saya dapat membuat \texttt{Makefile} fungsional
+  \item Saya dapat menjalankan sesi debug dasar dengan \texttt{gdb}
+  \item Saya memahami kompilasi kondisional (\texttt{\#ifdef}/\texttt{\#endif})
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas preprocessor (directive utama, makro objek dan fungsi, kompilasi kondisional, predefined macros), otomasi build dengan \texttt{Makefile} (variabel, target, pattern rules), dan pengenalan debugger \texttt{gdb} (breakpoint, step, print, backtrace).
+
+\textbf{Poin kunci:} selalu kurung parameter makro; \texttt{Makefile} menghemat waktu kompilasi; \texttt{-g} wajib untuk debug; \texttt{gdb} membantu menemukan bug tanpa \texttt{printf} debugging.
+
+\textbf{Kata kunci:} preprocessor, \texttt{\#define}, \texttt{\#ifdef}, makro, \texttt{Makefile}, \texttt{make}, \texttt{gdb}, breakpoint, debugging
+\end{rangkuman}
+
+\end{document}

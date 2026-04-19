@@ -11,7 +11,7 @@ echo ============================================================
 echo Compiling Individual Modules (modul_praktikum_c\modul)
 echo ============================================================
 
-pushd "%SOURCE_DIR%\modul"
+pushd "%MODULE_DIR%"
 
 for %%F in (modul-*.tex) do (
     set "FILE_NAME=%%~nF"
@@ -22,7 +22,6 @@ for %%F in (modul-*.tex) do (
 
     pdflatex -interaction=nonstopmode -halt-on-error "%%F"
     if !errorlevel! equ 0 (
-        rem Tidak ada bibliografi di modul ini; dua lari pdflatex untuk stabilkan referensi silang/TOC subfiles
         pdflatex -interaction=nonstopmode -halt-on-error "%%F"
 
         if exist "!FILE_NAME!.pdf" (
@@ -41,7 +40,7 @@ for %%F in (modul-*.tex) do (
 popd
 
 echo Cleaning up intermediate files...
-call :cleanup "%SOURCE_DIR%"
+call :cleanup "%LATEX_ROOT%"
 
 echo.
 echo Operation Completed. Check the output folder for PDF and .log files.

@@ -1,0 +1,264 @@
+\documentclass[../main.tex]{subfiles}
+\ifSubfilesClassLoaded{\setcounter{chapter}{9}}{}
+\begin{document}
+
+\chapter{Pointer: Alamat, Dereferensi, dan Hubungan dengan Larik}
+
+\begin{subcpmk}
+  \item Sub-CPMK 5.1: Operator alamat \texttt{\&}, dereferensi \texttt{*}, pointer NULL, aritmetika pointer, pointer ke array
+  \item Sub-CPMK 5.2: Simulasi pass-by-reference, pointer \texttt{void}, pointer \texttt{const}
+\end{subcpmk}
+
+\SesiRPS{10}{5.1--5.2}{$\sim$170 menit}{CPMK-5}
+
+% ============================================================
+\section{Apa Itu Pointer?}
+% ============================================================
+
+Pointer adalah variabel yang menyimpan \textbf{alamat memori} dari variabel lain. Setiap variabel dalam program menempati lokasi tertentu di memori, dan pointer memungkinkan kita mengakses serta memanipulasi lokasi tersebut secara tidak langsung (\textit{indirection}). Pointer adalah fitur paling kuat sekaligus paling berbahaya dalam C --- ia memberikan kontrol langsung atas memori, yang memungkinkan efisiensi tinggi tetapi juga membuka peluang bug serius jika digunakan salah.
+
+Memahami pointer adalah kunci untuk menguasai C secara mendalam. Pointer digunakan di mana-mana: array secara internal menggunakan pointer, string adalah pointer ke char, fungsi menerima pointer untuk mengubah data pemanggil, alokasi memori dinamis mengembalikan pointer, dan struktur data seperti linked list dibangun menggunakan pointer. Tanpa pemahaman pointer yang kuat, programmer C tidak dapat memanfaatkan bahasa ini secara efektif.
+
+% ============================================================
+\section{Deklarasi dan Operator Dasar}
+% ============================================================
+
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Operator} & \textbf{Nama} & \textbf{Keterangan} \\
+\hline
+\texttt{\&x} & Address-of & Mengambil \textbf{alamat memori} variabel \texttt{x} \\
+\hline
+\texttt{*p} & Dereference & Mengakses \textbf{nilai} di alamat yang ditunjuk \texttt{p} \\
+\hline
+\texttt{int *p} & Deklarasi pointer & \texttt{p} adalah pointer ke \texttt{int} \\
+\hline
+\texttt{NULL} & Pointer kosong & Pointer yang tidak menunjuk ke mana pun \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Dasar pointer --- alamat dan dereferensi]
+#include <stdio.h>
+
+int main(void) {
+    int x = 42;
+    int *p = &x;    // p menyimpan alamat x
+    
+    printf("Nilai x      : %d\n", x);        // 42
+    printf("Alamat x (&x): %p\n", (void*)&x); // misal: 0x7ffd...
+    printf("Isi pointer p: %p\n", (void*)p);   // sama dengan &x
+    printf("Nilai *p     : %d\n", *p);         // 42 (dereferensi)
+    
+    *p = 100;  // mengubah x melalui pointer
+    printf("x setelah *p=100: %d\n", x);       // 100!
+    
+    return 0;
+}
+\end{lstlisting}
+
+\begin{konsep}
+\textbf{Visualisasi memori:}
+
+\begin{tabular}{|c|c|c|l|}
+\hline
+\textbf{Variabel} & \textbf{Alamat} & \textbf{Nilai} & \textbf{Keterangan} \\
+\hline
+\texttt{x} & \texttt{0x1000} & \texttt{42} & Variabel integer biasa \\
+\hline
+\texttt{p} & \texttt{0x1008} & \texttt{0x1000} & Pointer: menyimpan alamat \texttt{x} \\
+\hline
+\end{tabular}
+
+\texttt{*p} artinya: ``ikuti alamat yang disimpan di \texttt{p}, baca/tulis nilai di sana.''
+\end{konsep}
+
+% ============================================================
+\section{Pointer NULL dan Keamanan}
+% ============================================================
+
+Pointer \texttt{NULL} adalah pointer yang secara eksplisit tidak menunjuk ke alamat valid. Selalu inisialisasi pointer yang belum digunakan ke \texttt{NULL}, dan selalu periksa apakah pointer bernilai \texttt{NULL} sebelum melakukan dereferensi --- dereferensi pointer \texttt{NULL} menyebabkan crash (\textit{segmentation fault}).
+
+\begin{lstlisting}[language=C,caption=Pointer NULL dan pengecekan]
+#include <stdio.h>
+
+int main(void) {
+    int *p = NULL;  // belum menunjuk ke mana pun
+    
+    if (p != NULL) {
+        printf("*p = %d\n", *p);
+    } else {
+        printf("Pointer masih NULL, tidak aman di-dereference!\n");
+    }
+    
+    int x = 10;
+    p = &x;  // sekarang p menunjuk ke x
+    
+    if (p != NULL) {
+        printf("*p = %d\n", *p);  // aman: 10
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Aritmetika Pointer}
+% ============================================================
+
+Aritmetika pointer memungkinkan perpindahan antar elemen array menggunakan operasi tambah/kurang pada pointer. Ketika pointer \texttt{p} bertipe \texttt{int*} di-increment (\texttt{p++}), ia bergerak sebanyak \texttt{sizeof(int)} byte (biasanya 4 byte) --- bukan 1 byte. Ini membuat traversal array sangat alami menggunakan pointer.
+
+\begin{lstlisting}[language=C,caption=Aritmetika pointer dan traversal array]
+#include <stdio.h>
+
+int main(void) {
+    int arr[] = {10, 20, 30, 40, 50};
+    int *p = arr;  // pointer ke elemen pertama
+    
+    printf("Traversal dengan pointer:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("  *(p+%d) = %d  (alamat: %p)\n",
+               i, *(p + i), (void*)(p + i));
+    }
+    
+    // arr[i] setara dengan *(arr + i)
+    printf("\narr[2] = %d, *(arr+2) = %d\n", arr[2], *(arr + 2));
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Simulasi Pass by Reference}
+% ============================================================
+
+Karena C hanya mendukung \textit{pass by value}, kita mensimulasikan \textit{pass by reference} dengan mengirimkan \textbf{pointer} ke variabel. Fungsi yang menerima pointer dapat mengubah nilai variabel asli melalui dereferensi.
+
+\begin{lstlisting}[language=C,caption=Swap menggunakan pointer (pass by reference)]
+#include <stdio.h>
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int main(void) {
+    int x = 10, y = 20;
+    
+    printf("Sebelum swap: x=%d, y=%d\n", x, y);
+    swap(&x, &y);  // kirim ALAMAT
+    printf("Sesudah swap: x=%d, y=%d\n", x, y);
+    
+    return 0;
+}
+/* Output:
+   Sebelum swap: x=10, y=20
+   Sesudah swap: x=20, y=10
+*/
+\end{lstlisting}
+
+% ============================================================
+\section{Pointer \texttt{const}}
+% ============================================================
+
+Keyword \texttt{const} pada pointer memiliki beberapa variasi yang mengontrol apa yang boleh dan tidak boleh diubah:
+
+\begin{tabular}{|l|p{4.5cm}|p{4.5cm}|}
+\hline
+\textbf{Deklarasi} & \textbf{Boleh} & \textbf{Tidak boleh} \\
+\hline
+\texttt{const int *p} & Ubah \texttt{p} (arahkan ke lain) & Ubah \texttt{*p} (nilai yang ditunjuk) \\
+\hline
+\texttt{int * const p} & Ubah \texttt{*p} (nilai) & Ubah \texttt{p} (arah pointer) \\
+\hline
+\texttt{const int * const p} & --- & Ubah keduanya \\
+\hline
+\end{tabular}
+
+\begin{lstlisting}[language=C,caption=Variasi pointer const]
+int x = 10, y = 20;
+
+const int *p1 = &x;    // pointer ke const int
+// *p1 = 99;           // ERROR: tidak bisa ubah nilai
+p1 = &y;               // OK: bisa ubah arah
+
+int * const p2 = &x;   // const pointer ke int
+*p2 = 99;              // OK: bisa ubah nilai
+// p2 = &y;            // ERROR: tidak bisa ubah arah
+\end{lstlisting}
+
+% ============================================================
+\section{Pointer \texttt{void}}
+% ============================================================
+
+Pointer \texttt{void *} adalah \textbf{generic pointer} yang dapat menunjuk ke tipe data apa pun. Ia digunakan oleh fungsi pustaka seperti \texttt{malloc()} dan \texttt{qsort()}. Pointer \texttt{void} tidak bisa di-dereference secara langsung --- harus di-cast terlebih dahulu ke tipe yang sesuai.
+
+\begin{lstlisting}[language=C,caption=Pointer void]
+#include <stdio.h>
+
+void cetak_nilai(void *ptr, char tipe) {
+    switch (tipe) {
+        case 'i': printf("%d\n", *(int*)ptr);    break;
+        case 'f': printf("%.2f\n", *(double*)ptr); break;
+        case 'c': printf("%c\n", *(char*)ptr);   break;
+    }
+}
+
+int main(void) {
+    int n = 42;
+    double d = 3.14;
+    char c = 'A';
+    
+    cetak_nilai(&n, 'i');   // 42
+    cetak_nilai(&d, 'f');   // 3.14
+    cetak_nilai(&c, 'c');   // A
+    
+    return 0;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Referensi sesi}
+% ============================================================
+\begin{itemize}[leftmargin=*]
+  \item Beej's Guide to C, bagian pointer. \url{https://beej.us/guide/bgc/html/index.html}
+  \item Modern C (Gustedt), pointer. \url{https://gustedt.gitlabpages.inria.fr/modern-c/}
+  \item cppreference, pointer. \url{https://en.cppreference.com/w/c/language/pointer}
+  \item Programiz, \textit{C Pointers}. \url{https://www.programiz.com/c-programming/c-pointers}
+\end{itemize}
+
+% ============================================================
+\begin{aktivitas}
+  \item Tulis fungsi \texttt{void swap(int *a, int *b)} dan uji dengan beberapa pasangan nilai.
+  \item Tulis fungsi yang menerima array via pointer dan mengembalikan nilai rata-rata.
+  \item Traversal array menggunakan pointer (bukan indeks) dan cetak setiap elemen.
+\end{aktivitas}
+
+\begin{latihan}
+  \item Apa perbedaan \texttt{int *p = \&x} dan \texttt{int p = \&x}? Mengapa yang kedua error?
+  \item Jelaskan mengapa \texttt{p++} pada \texttt{int*} bergerak 4 byte, bukan 1 byte.
+  \item Apa itu dangling pointer? Berikan contoh situasinya.
+  \item Gambar diagram memori untuk: \texttt{int a=5; int *p=\&a; int **pp=\&p;}
+\end{latihan}
+
+\begin{asesmen}
+\textbf{Tugas M8:} latihan pointer (swap, traversal array dengan pointer, fungsi yang mengubah nilai via pointer) + diagram memori sederhana (gambar tangan atau ASCII pada laporan).
+\end{asesmen}
+
+\begin{checklist}
+  \item Saya memahami operator \texttt{\&} dan \texttt{*}
+  \item Saya selalu menginisialisasi pointer (ke alamat valid atau NULL)
+  \item Saya dapat menulis fungsi dengan parameter pointer
+  \item Saya memahami hubungan pointer dan array
+  \item Saya dapat membedakan \texttt{const int *p} dan \texttt{int * const p}
+\end{checklist}
+
+\begin{rangkuman}
+Bab ini membahas pointer sebagai variabel yang menyimpan alamat memori, operator \texttt{\&} (address-of) dan \texttt{*} (dereference), pointer NULL, aritmetika pointer, hubungan pointer-array, simulasi pass-by-reference, pointer const, dan pointer void.
+
+\textbf{Poin kunci:} pointer $\neq$ bilangan sembarang; selalu inisialisasi ke alamat valid atau \texttt{NULL}; \texttt{arr[i]} setara \texttt{*(arr+i)}; pass by reference = kirim \texttt{\&variabel}.
+
+\textbf{Kata kunci:} pointer, alamat, dereferensi, \texttt{NULL}, aritmetika pointer, pass by reference, \texttt{const}, \texttt{void*}
+\end{rangkuman}
+
+\end{document}
