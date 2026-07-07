@@ -184,6 +184,7 @@ int main(void) {
 
 \texttt{union} mirip \texttt{struct}, tetapi semua anggotanya \textbf{berbagi lokasi memori yang sama}. Ukuran union adalah ukuran anggota terbesar. Hanya satu anggota yang ``aktif'' pada satu waktu --- menulis ke satu anggota menimpa yang lain. Union berguna untuk menghemat memori ketika hanya satu dari beberapa tipe data yang akan digunakan.
 
+\begin{modultable}[]{Perbandingan \texttt{struct} dan \texttt{union}}
 \begin{tabular}{|l|p{5cm}|p{5cm}|}
 \hline
 \textbf{Aspek} & \texttt{\textbf{struct}} & \texttt{\textbf{union}} \\
@@ -195,6 +196,7 @@ Akses & Semua anggota bisa diakses bersamaan & Hanya 1 anggota yang valid \\
 Ukuran & Jumlah semua anggota + padding & Ukuran anggota terbesar \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Penggunaan \texttt{union}]
 #include <stdio.h>
@@ -269,7 +271,7 @@ int main(void) {
   \item Buat struct \texttt{Buku} (judul, penulis, tahun, harga) dan cetak datanya.
   \item Buat array of struct untuk menyimpan 5 buku, lalu cari buku dengan harga tertinggi.
   \item Buat fungsi yang menerima pointer ke struct dan mengubah datanya.
-  \item Perhatikan kerangka latihan berikut yang merupakan konversi dari Pascal \texttt{prosedur\_upah\_latihan.pas} --- lengkapi definisi fungsi \texttt{input} dan \texttt{cetak} yang masih kosong:
+  \item \textbf{Latihan kerangka:} berikut konversi dari Pascal \texttt{prosedur\_upah\_latihan.pas}. Lengkapi fungsi \texttt{input} dan \texttt{cetak} yang masih kosong.
 \end{aktivitas}
 
 \lstinputlisting[language=C,caption={\texttt{contoh\_code/c/prosedur\_upah\_latihan.c} --- Latihan: fungsi upah dengan struct (kerangka konversi Pascal)}]{../contoh_code/c/prosedur_upah_latihan.c}

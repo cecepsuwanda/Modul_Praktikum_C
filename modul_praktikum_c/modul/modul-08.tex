@@ -21,6 +21,7 @@ Konsekuensi penting dari desain ini: buffer untuk menyimpan string harus \textbf
 \begin{konsep}
 \textbf{Representasi string \texttt{"Halo"} di memori:}
 
+\begin{modultable}[]{Representasi string \texttt{"Halo"} beserta null terminator}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 \texttt{[0]} & \texttt{[1]} & \texttt{[2]} & \texttt{[3]} & \texttt{[4]} & \\
@@ -28,6 +29,7 @@ Konsekuensi penting dari desain ini: buffer untuk menyimpan string harus \textbf
 \texttt{'H'} & \texttt{'a'} & \texttt{'l'} & \texttt{'o'} & \texttt{'\textbackslash 0'} & $\leftarrow$ null terminator \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \texttt{strlen("Halo") = 4} (tidak menghitung null terminator), tetapi butuh \textbf{5 byte} memori.
 \end{konsep}
@@ -70,6 +72,7 @@ int main(void) {
 \section{Input/Output String}
 % ============================================================
 
+\begin{modultable}[]{Perbandingan fungsi pembacaan string dari \textit{stdin}}
 {\small
 \begin{tabularx}{\textwidth}{@{}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{4.9cm}|>{\raggedright\arraybackslash}X|@{}}
 \hline
@@ -85,6 +88,7 @@ int main(void) {
 \end{tabularx}
 \par
 }
+\end{modultable}
 
 Dari pilihan di atas, \texttt{fgets} adalah cara yang direkomendasikan untuk membaca string karena aman terhadap buffer overflow dan mendukung spasi dalam input:
 
@@ -113,6 +117,7 @@ int main(void) {
 \section{Fungsi-fungsi \texttt{string.h}}
 % ============================================================
 
+\begin{modultable}[]{Fungsi umum pada \texttt{string.h}}
 \begin{tabular}{|l|l|p{6cm}|}
 \hline
 \textbf{Fungsi} & \textbf{Prototipe} & \textbf{Keterangan} \\
@@ -138,6 +143,7 @@ int main(void) {
 \texttt{strtok} & \texttt{char *strtok(s, delim)} & Tokenisasi (pecah string berdasarkan delimiter) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Demonstrasi fungsi string]
 #include <stdio.h>
@@ -207,6 +213,7 @@ int main(void) {
 \section{Konversi String-Angka}
 % ============================================================
 
+\begin{modultable}[]{Fungsi konversi string--angka dan format ke string}
 \begin{tabular}{|l|l|p{6cm}|}
 \hline
 \textbf{Fungsi} & \textbf{Konversi} & \textbf{Catatan} \\
@@ -224,6 +231,7 @@ int main(void) {
 \texttt{snprintf(buf, n, ...)} & Angka $\rightarrow$ string & Aman (batasi ukuran) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Konversi string ke angka]
 #include <stdio.h>

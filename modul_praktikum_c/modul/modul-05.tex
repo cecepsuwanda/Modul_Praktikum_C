@@ -63,6 +63,7 @@ void tampilkan_garis(int panjang) {
 }
 \end{lstlisting}
 
+\begin{modultable}[]{Komponen sintaks prototipe dan definisi fungsi}
 \begin{tabular}{|>{\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{9.0cm}|}
 \hline
 \textbf{Komponen} & \textbf{Keterangan} \\
@@ -74,6 +75,7 @@ void tampilkan_garis(int panjang) {
 \texttt{int main(void)} & Tidak menerima parameter (\texttt{void}); mengembalikan kode keluar \\
 \hline
 \end{tabular}
+\end{modultable}
 
 % ============================================================
 \section{Parameter: Pass by Value}
@@ -148,6 +150,7 @@ int main(void) {
 
 Storage class menentukan \textbf{masa hidup} (\textit{lifetime}) dan \textbf{linkage} (visibilitas antar-file) sebuah variabel. C menyediakan empat storage class:
 
+\begin{modultable}[]{Ringkasan storage class dalam C}
 \begin{tabular}{|l|l|l|p{5.5cm}|}
 \hline
 \textbf{Storage Class} & \textbf{Lifetime} & \textbf{Scope} & \textbf{Keterangan} \\
@@ -163,6 +166,7 @@ Storage class menentukan \textbf{masa hidup} (\textit{lifetime}) dan \textbf{lin
 \texttt{register} & Blok & Lokal & Saran ke kompilator: simpan di register (jarang dipakai) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=\texttt{static} lokal --- counter yang bertahan]
 #include <stdio.h>
@@ -232,6 +236,7 @@ int main(void) {
 Fibonacci rekursif di atas sangat \textbf{tidak efisien} (kompleksitas eksponensial $O(2^n)$) karena menghitung ulang nilai yang sama berkali-kali. Untuk praktik nyata, gunakan iterasi atau \textit{memoization}. Rekursi lebih cocok untuk masalah seperti traversal pohon dan divide-and-conquer (Modul 17).
 \end{catatan}
 
+\begin{modultable}[]{Perbandingan iterasi dan rekursi}
 {\small
 \begin{tabular}{|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{4.2cm}|}
 \hline
@@ -249,6 +254,7 @@ Performa & Umumnya lebih cepat & Overhead pemanggilan fungsi \\
 \hline
 \end{tabular}
 }
+\end{modultable}
 
 % ============================================================
 \section{Referensi sesi}

@@ -115,6 +115,7 @@ Include guard mencegah isi header disertakan lebih dari sekali dalam unit kompil
 
 Ada dua cara menulis include guard:
 
+\begin{modultable}[]{Perbandingan include guard tradisional dan \texttt{\#pragma once}}
 \begin{tabular}{|l|p{5cm}|p{5cm}|}
 \hline
 \textbf{Metode} & \textbf{Tradisional (\texttt{\#ifndef})} & \textbf{Modern (\texttt{\#pragma once})} \\
@@ -130,6 +131,7 @@ Sintaks &
 Portabilitas & Standar C (semua kompilator) & Didukung mayoritas kompilator (bukan standar resmi) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 % ============================================================
 \section{Kompilasi Multi-berkas}

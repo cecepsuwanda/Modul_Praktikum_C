@@ -27,6 +27,7 @@ Dalam C, ukuran array statis harus ditentukan saat kompilasi (kecuali VLA di C99
 \begin{konsep}
 \textbf{Representasi memori array \texttt{int arr[5] = \{10,20,30,40,50\}}:}
 
+\begin{modultable}[]{Ilustrasi indeks dan nilai elemen array 1D}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 \texttt{arr[0]} & \texttt{arr[1]} & \texttt{arr[2]} & \texttt{arr[3]} & \texttt{arr[4]} \\
@@ -36,6 +37,7 @@ Dalam C, ukuran array statis harus ditentukan saat kompilasi (kecuali VLA di C99
 \multicolumn{5}{|c|}{$\underbrace{\hspace{6cm}}_{5 \times \texttt{sizeof(int)}}$ byte berurutan di memori} \\
 \hline
 \end{tabular}
+\end{modultable}
 \end{konsep}
 
 % ============================================================
@@ -80,6 +82,7 @@ int main(void) {
 
 \lstinputlisting[language=C,caption={\texttt{contoh\_code/c/array\_isi\_cetak.c} --- Mengisi dan mencetak array dengan \texttt{while}+\texttt{for} (konversi Pascal)}]{../contoh_code/c/array_isi_cetak.c}
 
+\begin{modultable}[]{Contoh pola inisialisasi array statis}
 \begin{tabular}{|l|p{9cm}|}
 \hline
 \textbf{Inisialisasi} & \textbf{Keterangan} \\
@@ -95,6 +98,7 @@ int main(void) {
 \texttt{int a[5]} & \textbf{Tidak diinisialisasi} --- berisi garbage! \\
 \hline
 \end{tabular}
+\end{modultable}
 
 % ============================================================
 \section{Array sebagai Parameter Fungsi}

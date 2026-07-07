@@ -24,6 +24,7 @@ Setiap program C secara otomatis memiliki tiga stream yang sudah terbuka: \textt
 \section{Membuka dan Menutup File}
 % ============================================================
 
+\begin{modultable}[]{Mode pembukaan file teks dan biner (\texttt{fopen})}
 \begin{tabular}{|l|p{9cm}|}
 \hline
 \textbf{Mode} & \textbf{Keterangan} \\
@@ -45,6 +46,7 @@ Setiap program C secara otomatis memiliki tiga stream yang sudah terbuka: \textt
 \texttt{"wb"} & Tulis biner. \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{konsep}
 \textbf{Pola standar File I/O:}
@@ -85,6 +87,7 @@ int main(void) {
 }
 \end{lstlisting}
 
+\begin{modultable}[]{Fungsi pembacaan dari stream file}
 {\small
 \begin{tabular}{|>{\raggedright\arraybackslash}p{3.0cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{6.5cm}|}
 \hline
@@ -100,6 +103,7 @@ int main(void) {
 \hline
 \end{tabular}
 }
+\end{modultable}
 
 % ============================================================
 \section{Menulis ke File Teks}
@@ -134,6 +138,7 @@ int main(void) {
 }
 \end{lstlisting}
 
+\begin{modultable}[]{Fungsi penulisan ke stream file}
 {\small
 \begin{tabular}{|>{\raggedright\arraybackslash}p{3.0cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{6.5cm}|}
 \hline
@@ -149,6 +154,7 @@ int main(void) {
 \hline
 \end{tabular}
 }
+\end{modultable}
 
 % ============================================================
 \section{File Biner}
@@ -192,6 +198,7 @@ int main(void) {
 \section{Posisi File dan Penanganan Error}
 % ============================================================
 
+\begin{modultable}[]{Fungsi posisi file dan pelaporan error}
 \begin{tabular}{|l|p{8cm}|}
 \hline
 \textbf{Fungsi} & \textbf{Keterangan} \\
@@ -209,6 +216,7 @@ int main(void) {
 \texttt{perror(msg)} & Cetak pesan error berdasarkan \texttt{errno} \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Menghitung ukuran file dengan \texttt{fseek}/\texttt{ftell}]
 #include <stdio.h>

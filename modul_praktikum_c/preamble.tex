@@ -49,6 +49,10 @@
 
 \usepackage{listings}
 
+% Jarak vertikal seragam untuk gambar, tabel, dan listing
+\newlength{\ModulMediaskip}
+\setlength{\ModulMediaskip}{\baselineskip}
+
 \definecolor{ckeyword}{rgb}{0.0,0.45,0.7}
 \definecolor{cstring}{rgb}{0.6,0.1,0.1}
 \definecolor{ccomment}{rgb}{0.25,0.5,0.35}
@@ -77,17 +81,39 @@
   escapeinside={(*@}{@*)},
   xleftmargin=15pt,
   xrightmargin=5pt,
-  aboveskip=1.5em,
-  belowskip=1.5em
+  aboveskip=\ModulMediaskip,
+  belowskip=\ModulMediaskip
 }
 
 \renewcommand{\lstlistlistingname}{Daftar Kode Program}
 \renewcommand{\lstlistingname}{Kode Program}
-\lstset{style=cstyle}
+\renewcommand{\figurename}{Gambar}
+% Penomoran listing per bab (memerlukan listings terbaru; lihat fallback di bawah)
+\lstset{style=cstyle, numberbychapter=true}
 
 \lstnewenvironment{ccode}[1][]{
   \lstset{style=cstyle, #1}
 }{}
+
+\usepackage{caption}
+% \captionof{table} di modultable: hypcap tidak berlaku; matikan agar log bersih
+\captionsetup{font=small, labelfont=bf, skip=\ModulMediaskip, hypcap=false}
+
+% Tabel berjudul di teks (non-float): \begin{modultable}[label-opsional]{Judul}...\end{modultable}
+\newenvironment{modultable}[2][]{%
+  \par\addvspace{\ModulMediaskip}%
+  \begin{center}%
+  \captionof{table}{#2}%
+  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
+}{%
+  \end{center}%
+  \addvspace{\ModulMediaskip}%
+}
+
+% Jarak vertikal untuk gambar (float) agar selaras dengan \ModulMediaskip
+\setlength{\textfloatsep}{\ModulMediaskip}
+\setlength{\floatsep}{\ModulMediaskip}
+\setlength{\intextsep}{\ModulMediaskip}
 
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}

@@ -29,6 +29,7 @@ Memahami preprocessor penting karena banyak konstruksi C bergantung padanya --- 
 \section{Tabel Directive Preprocessor}
 % ============================================================
 
+\begin{modultable}[]{Directive preprocessor yang umum dipakai}
 {\small
 \begin{tabular}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}p{9.4cm}|}
 \hline
@@ -54,6 +55,7 @@ Memahami preprocessor penting karena banyak konstruksi C bergantung padanya --- 
 \hline
 \end{tabular}
 }
+\end{modultable}
 
 % ============================================================
 \section{Makro \texttt{\#define}}
@@ -133,6 +135,7 @@ int main(void) {
 \section{Predefined Macros}
 % ============================================================
 
+\begin{modultable}[]{Makro praprosesor standar (\texttt{\_\_FILE\_\_}, \texttt{\_\_LINE\_\_}, dll.)}
 \begin{tabular}{|l|p{8cm}|}
 \hline
 \textbf{Makro} & \textbf{Isi} \\
@@ -148,6 +151,7 @@ int main(void) {
 \texttt{\_\_func\_\_} & Nama fungsi saat ini (C99+) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Menggunakan predefined macros untuk log]
 #include <stdio.h>
@@ -206,6 +210,7 @@ run: $(TARGET)
 .PHONY: all clean run
 \end{lstlisting}
 
+\begin{modultable}[]{Simbol variabel otomatis pada Makefile GNU}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Simbol Make} & \textbf{Arti} \\
@@ -221,6 +226,7 @@ run: $(TARGET)
 \texttt{.PHONY} & Target yang bukan file (selalu dieksekusi) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{catatan}
 Pada Windows dengan MinGW, gunakan \texttt{mingw32-make} sebagai pengganti \texttt{make}. Target \texttt{clean} mungkin perlu menggunakan \texttt{del} alih-alih \texttt{rm -f}.
@@ -232,6 +238,7 @@ Pada Windows dengan MinGW, gunakan \texttt{mingw32-make} sebagai pengganti \text
 
 \texttt{gdb} (\textit{GNU Debugger}) memungkinkan kita menjalankan program langkah demi langkah, memeriksa nilai variabel, dan menemukan sumber bug. Untuk menggunakan \texttt{gdb}, kompilasi program dengan opsi \texttt{-g} (menyertakan informasi debug).
 
+\begin{modultable}[]{Perintah GDB pengenalan}
 \begin{tabular}{|l|p{8cm}|}
 \hline
 \textbf{Perintah GDB} & \textbf{Keterangan} \\
@@ -263,6 +270,7 @@ Pada Windows dengan MinGW, gunakan \texttt{mingw32-make} sebagai pengganti \text
 \texttt{watch x} & Berhenti ketika nilai \texttt{x} berubah \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{contoh}
 \textbf{Contoh sesi GDB:}

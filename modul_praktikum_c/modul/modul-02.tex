@@ -51,6 +51,7 @@ C menyediakan beberapa tipe data dasar (\textit{primitive types}) yang masing-ma
 
 Kita dapat menggunakan operator \texttt{sizeof} untuk mengetahui ukuran (dalam byte) dari suatu tipe data atau variabel pada platform tertentu. Nilai yang dikembalikan \texttt{sizeof} bertipe \texttt{size\_t} (bilangan bulat tak bertanda).
 
+\begin{modultable}[]{Ukuran dan rentang tipikal tipe data primitif C}
 \begin{tabular}{|l|c|l|l|}
 \hline
 \textbf{Tipe Data} & \textbf{Ukuran (tipikal)} & \textbf{Rentang (tipikal)} & \textbf{Format} \\
@@ -72,6 +73,7 @@ Kita dapat menggunakan operator \texttt{sizeof} untuk mengetahui ukuran (dalam b
 \texttt{unsigned int} & 4 byte & $0$ s.d. $4{,}3 \times 10^{9}$ & \texttt{\%u} \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Menampilkan ukuran tipe data dengan \texttt{sizeof}]
 #include <stdio.h>
@@ -124,6 +126,7 @@ int main(void) {
 
 \textit{Escape sequence} adalah karakter khusus yang diawali tanda \textit{backslash} (\texttt{\textbackslash}) yang digunakan untuk merepresentasikan karakter non-cetak atau karakter khusus dalam string. Escape sequence diproses oleh kompilator saat menghasilkan kode, bukan saat \textit{runtime}.
 
+\begin{modultable}[]{Escape sequence umum dalam string C}
 \begin{tabular}{|l|l|p{7cm}|}
 \hline
 \textbf{Sequence} & \textbf{Nama} & \textbf{Keterangan} \\
@@ -143,6 +146,7 @@ int main(void) {
 \texttt{\textbackslash a} & Alert/Bell & Bunyi bel (jika didukung terminal) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 % ============================================================
 \section{Operator}
@@ -154,6 +158,7 @@ Setiap operator memiliki \textbf{precedence} (urutan prioritas) dan \textbf{asso
 
 \subsection{Operator Aritmatika}
 
+\begin{modultable}[]{Operator aritmatika dalam C}
 \begin{tabular}{|c|l|l|l|}
 \hline
 \textbf{Operator} & \textbf{Nama} & \textbf{Contoh} & \textbf{Hasil} \\
@@ -169,6 +174,7 @@ Setiap operator memiliki \textbf{precedence} (urutan prioritas) dan \textbf{asso
 \texttt{\%} & Modulus (sisa bagi) & \texttt{7 \% 2} & \texttt{1} \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{catatan}
 \textbf{Pembagian integer:} ketika kedua operand bertipe \texttt{int}, hasil pembagian juga \texttt{int} (bagian desimal dibuang). Untuk mendapatkan hasil desimal, setidaknya salah satu operand harus bertipe \texttt{float} atau \texttt{double}:
@@ -178,6 +184,7 @@ Setiap operator memiliki \textbf{precedence} (urutan prioritas) dan \textbf{asso
 
 \subsection{Operator Relasional dan Logika}
 
+\begin{modultable}[]{Operator relasional dan logika}
 \begin{tabular}{|c|l||c|l|}
 \hline
 \multicolumn{2}{|c||}{\textbf{Relasional}} & \multicolumn{2}{c|}{\textbf{Logika}} \\
@@ -195,9 +202,11 @@ Setiap operator memiliki \textbf{precedence} (urutan prioritas) dan \textbf{asso
 \texttt{<=} & Lebih kecil atau sama & & \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \subsection{Operator Assignment dan Increment/Decrement}
 
+\begin{modultable}[]{Operator assignment dan increment/decrement}
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Operator} & \textbf{Contoh} & \textbf{Setara dengan} \\
@@ -219,6 +228,7 @@ Setiap operator memiliki \textbf{precedence} (urutan prioritas) dan \textbf{asso
 \texttt{--} & \texttt{x--} / \texttt{--x} & Post-decrement / Pre-decrement \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \lstinputlisting[language=C,caption={\texttt{contoh\_code/c/assignment\_real.c} --- Assignment dan operasi aritmatika bilangan real (konversi Pascal)}]{../contoh_code/c/assignment_real.c}
 
@@ -272,7 +282,7 @@ Penting untuk selalu memeriksa \textbf{nilai balik} \texttt{scanf()}: fungsi ini
 
 {\small
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\textwidth}{@{}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}X|@{}}
+\begin{tabularx}{\textwidth}{@{}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}p{4.8cm}|>{\raggedright\arraybackslash}X|@{}}
 \hline
 \textbf{Specifier} & \textbf{Tipe} & \textbf{Keterangan} & \textbf{Contoh} \\
 \hline
@@ -301,9 +311,10 @@ Penting untuk selalu memeriksa \textbf{nilai balik} \texttt{scanf()}: fungsi ini
 \texttt{\%p} & pointer & Alamat memori & \texttt{printf("\%p", \&x)} \\
 \hline
 \texttt{\%zu} & \texttt{size\_t} & Hasil \texttt{sizeof} & \texttt{printf("\%zu", sizeof(int))} \\
-\end{tabularx}
+\hline
+\end{tabularx}%
 }
-\par
+
 \subsection{Format Output: Lebar dan Presisi}
 
 \begin{lstlisting}[language=C,caption=Pengaturan lebar dan presisi output]

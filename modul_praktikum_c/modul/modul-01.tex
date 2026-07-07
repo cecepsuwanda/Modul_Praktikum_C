@@ -28,6 +28,7 @@ Hingga saat ini, C tetap menjadi salah satu bahasa yang paling berpengaruh di du
 \begin{catatan}
 C memiliki beberapa versi standar yang dikeluarkan oleh ISO/ANSI:
 
+\begin{modultable}[]{Pergeseran standar bahasa C (ISO/ANSI)}
 {\small
 \begin{tabular}{|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{8.8cm}|}
 \hline
@@ -45,6 +46,7 @@ C23 & 2024 & \texttt{nullptr}, \texttt{constexpr}, \texttt{auto}, \texttt{typeof
 \hline
 \end{tabular}
 }
+\end{modultable}
 
 Praktikum ini menggunakan standar \textbf{C17} sebagai acuan utama.
 \end{catatan}
@@ -60,6 +62,7 @@ Secara umum, kompilator \texttt{gcc} mengeksekusi seluruh tahapan berikut secara
 \begin{konsep}
 \textbf{Empat Tahapan Kompilasi:}
 
+\begin{modultable}[]{Empat tahapan kompilasi dari kode sumber hingga executable}
 \begin{tabular}{|c|l|l|l|}
 \hline
 \textbf{No} & \textbf{Tahap} & \textbf{Input $\rightarrow$ Output} & \textbf{Opsi GCC} \\
@@ -73,6 +76,7 @@ Secara umum, kompilator \texttt{gcc} mengeksekusi seluruh tahapan berikut secara
 4 & Linker (penaut) & \texttt{.o} $\rightarrow$ executable & \texttt{gcc} (default) \\
 \hline
 \end{tabular}
+\end{modultable}
 \end{konsep}
 
 Tahap \textbf{praprosesor} menangani semua directive yang diawali tanda \texttt{\#} (seperti \texttt{\#include} dan \texttt{\#define}) --- ia menggabungkan isi header file ke dalam kode sumber dan mengganti semua makro. Tahap \textbf{kompilasi} menerjemahkan kode C menjadi instruksi assembly khusus arsitektur prosesor. Tahap \textbf{assembler} mengubah assembly menjadi kode mesin dalam format objek (\texttt{.o}). Terakhir, tahap \textbf{linker} menggabungkan satu atau lebih berkas objek dengan pustaka standar C (\texttt{libc}) untuk menghasilkan program yang siap dijalankan.
@@ -83,6 +87,7 @@ Tahap \textbf{praprosesor} menangani semua directive yang diawali tanda \texttt{
 
 Kompilator GCC menyediakan banyak opsi (\textit{flags}) yang mengontrol perilaku kompilasi. Dalam praktikum ini, mahasiswa \textbf{wajib} menggunakan opsi peringatan agar terbiasa menulis kode yang bersih dan aman sejak awal. Berikut opsi-opsi yang paling sering digunakan:
 
+\begin{modultable}[]{Opsi kompilator GCC yang sering dipakai}
 \begin{tabular}{|l|p{9.5cm}|}
 \hline
 \textbf{Opsi} & \textbf{Keterangan} \\
@@ -108,6 +113,7 @@ Kompilator GCC menyediakan banyak opsi (\textit{flags}) yang mengontrol perilaku
 \texttt{-O2} & Optimasi level 2 (untuk program rilis; tidak dipakai saat debug) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{contoh}
 Perintah kompilasi standar yang direkomendasikan untuk praktikum:
@@ -148,6 +154,7 @@ Contoh berikut adalah versi program \texttt{hello.c} yang merupakan konversi dar
 
 \textbf{Penjelasan baris per baris:}
 
+\begin{modultable}[]{Penjelasan baris demi baris program \texttt{hello.c}}
 \begin{tabular}{|c|p{11cm}|}
 \hline
 \textbf{Baris} & \textbf{Penjelasan} \\
@@ -163,6 +170,7 @@ Contoh berikut adalah versi program \texttt{hello.c} yang merupakan konversi dar
 7 & \texttt{return 0} mengembalikan kode keluar 0 ke OS (artinya sukses) \\
 \hline
 \end{tabular}
+\end{modultable}
 
 % ============================================================
 \section{Prosedur Kerja Praktikum}
@@ -240,6 +248,7 @@ Berikut adalah contoh program yang mendemonstrasikan penggunaan variabel string,
 
 \textbf{Rubrik singkat:}
 
+\begin{modultable}[]{Rubrik formatif tugas M1 (program pertama)}
 \begin{tabular}{|l|c|p{7cm}|}
 \hline
 \textbf{Aspek} & \textbf{Bobot} & \textbf{Indikator} \\
@@ -253,6 +262,7 @@ Penggunaan flag & 20\% & \texttt{-Wall -Wextra} digunakan \\
 Keberesan berkas & 10\% & Nama file sesuai konvensi \\
 \hline
 \end{tabular}
+\end{modultable}
 \end{asesmen}
 
 \begin{checklist}

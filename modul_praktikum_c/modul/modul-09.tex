@@ -23,6 +23,7 @@ Memahami pointer adalah kunci untuk menguasai C secara mendalam. Pointer digunak
 \section{Deklarasi dan Operator Dasar}
 % ============================================================
 
+\begin{modultable}[]{Operator dan notasi dasar pointer}
 \begin{tabular}{|l|l|p{7cm}|}
 \hline
 \textbf{Operator} & \textbf{Nama} & \textbf{Keterangan} \\
@@ -36,6 +37,7 @@ Memahami pointer adalah kunci untuk menguasai C secara mendalam. Pointer digunak
 \texttt{NULL} & Pointer kosong & Pointer yang tidak menunjuk ke mana pun \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Dasar pointer --- alamat dan dereferensi]
 #include <stdio.h>
@@ -59,6 +61,7 @@ int main(void) {
 \begin{konsep}
 \textbf{Visualisasi memori:}
 
+\begin{modultable}[]{Contoh visualisasi variabel dan pointer di memori}
 \begin{tabular}{|c|c|c|l|}
 \hline
 \textbf{Variabel} & \textbf{Alamat} & \textbf{Nilai} & \textbf{Keterangan} \\
@@ -68,6 +71,7 @@ int main(void) {
 \texttt{p} & \texttt{0x1008} & \texttt{0x1000} & Pointer: menyimpan alamat \texttt{x} \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \texttt{*p} artinya: ``ikuti alamat yang disimpan di \texttt{p}, baca/tulis nilai di sana.''
 \end{konsep}
@@ -163,6 +167,7 @@ int main(void) {
 
 Keyword \texttt{const} pada pointer memiliki beberapa variasi yang mengontrol apa yang boleh dan tidak boleh diubah:
 
+\begin{modultable}[]{Variasi \texttt{const} pada deklarasi pointer}
 \begin{tabular}{|l|p{4.5cm}|p{4.5cm}|}
 \hline
 \textbf{Deklarasi} & \textbf{Boleh} & \textbf{Tidak boleh} \\
@@ -174,6 +179,7 @@ Keyword \texttt{const} pada pointer memiliki beberapa variasi yang mengontrol ap
 \texttt{const int * const p} & --- & Ubah keduanya \\
 \hline
 \end{tabular}
+\end{modultable}
 
 \begin{lstlisting}[language=C,caption=Variasi pointer const]
 int x = 10, y = 20;
